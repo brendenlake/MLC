@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: fep fep OUT: color:#0000ff; color:#0000ff;
+IN: blicket fep OUT: color:#ff0000; color:#0000ff;
+IN: fep wif fep OUT: color:#0000ff; color:#b7b600; color:#0000ff;
+IN: kiki wif fep OUT: color:#33cc33; color:#b7b600; color:#0000ff;
+IN: fep zup OUT: color:#0000ff; color:#ce9fcf;
+IN: fep OUT: color:#0000ff;
+IN: fep wif kiki OUT: color:#0000ff; color:#b7b600; color:#33cc33;
+
+*GRAMMAR*

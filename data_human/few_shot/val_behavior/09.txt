@@ -1,0 +1,39 @@
+*SUPPORT*
+IN: 1 OUT: 1
+IN: 3 OUT: 3
+IN: 2 OUT: 2
+IN: DAX OUT: DAX
+IN: 2 after 3 OUT: 3 2
+IN: 1 after 2 OUT: 2 1
+IN: 2 thrice OUT: 2 2 2
+IN: 2 surround 3 OUT: 2 3 2
+IN: 1 thrice OUT: 1 1 1
+IN: 3 surround 1 OUT: 3 1 3
+IN: 2 thrice after 3 OUT: 3 2 2 2
+IN: 3 after 1 surround 2 OUT: 1 2 1 3
+IN: 2 after 3 thrice OUT: 3 3 3 2
+IN: 3 surround 1 after 2 OUT: 2 3 1 3
+
+*QUERY*
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 3 DAX 1
+IN: DAX surround 3 after 1 thrice OUT: 3 DAX 3 1 1 1
+IN: DAX surround 3 after 1 thrice OUT: DAX 3 1 1 1
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 3 DAX 3
+IN: DAX surround 3 after 1 thrice OUT: DAX DAX 2 DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 DAX DAX DAX
+
+*GRAMMAR*

@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: lug zup OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#ce9fcf; color:#ce9fcf; color:#ce9fcf;
+IN: tufa lug OUT: color:#b7b600; color:#b7b600; color:#b7b600; color:#b7b600; color:#33cc33; color:#33cc33; color:#33cc33;
+IN: lug OUT: color:#33cc33; color:#33cc33; color:#33cc33;
+IN: kiki blicket lug OUT: color:#ff0000; color:#ff0000; color:#ff0000; color:#ff0000; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#33cc33; color:#33cc33; color:#33cc33;
+IN: lug blicket kiki OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#ff0000; color:#ff0000; color:#ff0000; color:#ff0000;
+IN: lug lug OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33;
+IN: lug blicket lug OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#0000ff; color:#33cc33; color:#33cc33; color:#33cc33;
+
+*GRAMMAR*

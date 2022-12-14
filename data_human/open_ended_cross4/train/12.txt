@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: wif gazzer wif OUT: color:#ce9fcf; color:#33cc33; color:#ce9fcf;
+IN: wif blicket OUT: color:#ce9fcf; color:#0000ff;
+IN: wif wif OUT: color:#ce9fcf; color:#ce9fcf;
+IN: kiki wif OUT: color:#b7b600; color:#ce9fcf;
+IN: wif OUT: color:#ce9fcf;
+IN: wif gazzer dax OUT: color:#ce9fcf; color:#33cc33; color:#00b0b3;
+IN: dax gazzer wif OUT: color:#00b0b3; color:#33cc33; color:#ce9fcf;
+
+*GRAMMAR*

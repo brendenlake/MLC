@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: blicket gazzer zup OUT: color:#ce9fcf; color:#33cc33; color:#0000ff; color:#ff0000; color:#b7b600;
+IN: zup gazzer blicket OUT: color:#b7b600; color:#0000ff; color:#ff0000; color:#ce9fcf; color:#33cc33;
+IN: fep blicket OUT: color:#00b0b3; color:#ce9fcf; color:#33cc33;
+IN: blicket gazzer blicket OUT: color:#ce9fcf; color:#33cc33; color:#0000ff; color:#ff0000; color:#ce9fcf; color:#33cc33;
+IN: blicket wif OUT: color:#ce9fcf; color:#33cc33; color:#ff0000;
+IN: blicket blicket OUT: color:#ce9fcf; color:#33cc33; color:#ce9fcf; color:#33cc33;
+IN: blicket OUT: color:#ce9fcf; color:#33cc33;
+
+*GRAMMAR*

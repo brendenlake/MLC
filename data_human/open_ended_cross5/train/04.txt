@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: zup OUT: color:#0000ff;
+IN: zup kiki wif OUT: color:#0000ff; color:#ff0000; color:#33cc33;
+IN: wif kiki zup OUT: color:#33cc33; color:#ff0000; color:#0000ff;
+IN: dax zup OUT: color:#ce9fcf; color:#0000ff;
+IN: zup zup OUT: color:#0000ff; color:#0000ff;
+IN: zup kiki zup OUT: color:#0000ff; color:#ff0000; color:#0000ff;
+IN: zup tufa OUT: color:#0000ff; color:#b7b600;
+
+*GRAMMAR*

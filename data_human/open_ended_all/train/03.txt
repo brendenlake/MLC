@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: dax kiki OUT: color:#ff0000; color:#ff0000; color:#ff0000; color:#ff0000;
+IN: kiki OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33;
+IN: kiki kiki OUT: color:#ce9fcf; color:#ce9fcf; color:#ce9fcf; color:#ce9fcf;
+IN: kiki lug fep OUT: color:#00b0b3; color:#00b0b3; color:#00b0b3; color:#00b0b3;
+IN: fep lug kiki OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33;
+IN: kiki wif OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33;
+IN: kiki lug kiki OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33;
+
+*GRAMMAR*

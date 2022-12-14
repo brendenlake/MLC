@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: kiki gazzer kiki OUT: color:#00b0b3; color:#ff0000; color:#00b0b3;
+IN: kiki fep OUT: color:#00b0b3; color:#ce9fcf;
+IN: kiki kiki OUT: color:#00b0b3; color:#00b0b3;
+IN: lug gazzer kiki OUT: color:#b7b600; color:#ff0000; color:#00b0b3;
+IN: kiki OUT: color:#00b0b3;
+IN: tufa kiki OUT: color:#0000ff; color:#00b0b3;
+IN: kiki gazzer lug OUT: color:#00b0b3; color:#ff0000; color:#b7b600;
+
+*GRAMMAR*

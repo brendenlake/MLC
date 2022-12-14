@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: kiki OUT: color:#33cc33; color:#33cc33;
+IN: kiki fep OUT: color:#33cc33; color:#33cc33; color:#ff0000;
+IN: kiki blicket zup OUT: color:#33cc33; color:#33cc33; color:#ce9fcf; color:#0000ff;
+IN: dax kiki OUT: color:#00b0b3; color:#33cc33; color:#33cc33;
+IN: zup blicket kiki OUT: color:#0000ff; color:#ce9fcf; color:#33cc33; color:#33cc33;
+IN: kiki blicket kiki OUT: color:#33cc33; color:#33cc33; color:#ce9fcf; color:#33cc33; color:#33cc33;
+IN: kiki kiki OUT: color:#33cc33; color:#33cc33; color:#33cc33; color:#33cc33;
+
+*GRAMMAR*

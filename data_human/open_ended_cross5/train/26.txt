@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: kiki wif kiki OUT: color:#b7b600; color:#b7b600; color:#ff0000; color:#b7b600; color:#b7b600;
+IN: kiki OUT: color:#b7b600; color:#b7b600;
+IN: tufa kiki OUT: color:#ce9fcf; color:#b7b600; color:#b7b600;
+IN: kiki kiki OUT: color:#b7b600; color:#b7b600; color:#b7b600; color:#b7b600;
+IN: kiki fep OUT: color:#b7b600; color:#b7b600; color:#0000ff;
+IN: blicket wif kiki OUT: color:#33cc33; color:#00b0b3; color:#ff0000; color:#b7b600; color:#b7b600;
+IN: kiki wif blicket OUT: color:#b7b600; color:#b7b600; color:#ff0000; color:#33cc33; color:#00b0b3;
+
+*GRAMMAR*

@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: wif zup dax OUT: color:#0000ff; color:#b7b600; color:#ff0000;
+IN: wif zup wif OUT: color:#0000ff; color:#b7b600; color:#33cc33;
+IN: blicket wif OUT: color:#ce9fcf; color:#0000ff;
+IN: dax zup wif OUT: color:#ff0000; color:#b7b600; color:#0000ff;
+IN: wif wif OUT: color:#0000ff; color:#0000ff;
+IN: wif OUT: color:#0000ff;
+IN: wif kiki OUT: color:#0000ff; color:#00b0b3;
+
+*GRAMMAR*

@@ -1,18 +1,31 @@
 # Behaviorally-Informed Meta-Learning (BIML)
 
-BIML is a meta-learning approach for guiding neural networks to human-like inductive biases, through high-level guidance or direct human examples. This code shows how to train and evaluate a sequence-to-sequence (seq2seq) transformer, which implements BIML using a form of memory-based meta-learning.
+BIML is a meta-learning approach for guiding neural networks to human-like systematic generalization and inductive biases, through high-level guidance or direct human examples. This code shows how to train and evaluate a sequence-to-sequence (seq2seq) transformer in PyTorch to implement BIML through memory-based meta-learning.
+
+This code accompanies the following submitted paper:
+- Lake, B. M. and Baroni, M. (submitted). Human-like systematic generalization through a meta-learning neural network. 
 
 ### Credits
 This repo borrows from the excellent [PyTorch seq2seq tutorial](https://pytorch.org/tutorials/beginner/translation_transformer.html).
 
+### Requirements
+Python 3 with the following packages:
+torch, sklearn, numpy, matplotlib
+
+
 ### Using the code
 
+**Downloading the meta-training episodes**  
+For training BIML on few-shot learning, you need to download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/data_algebraic.zip) with the 100K meta-training episodes. Please extract `data_algebraic.zip` such that `data_algebraic`is a sub-directory of the main repository directory.
+
 **Training a model**   
-This demos a simple retrieval task. To train a model that just retrieves a query output from the support set (which contains the query command exactly), you can type:
+To train BIML on few-shot learning (BIML model in Fig. 2 and Table 4B), you can run the command:
 ```python
-python train.py --episode_type retrieve --nepochs 10 --fn_out_model net_retrieve.tar
+python train.py --episode_type algebraic+biases --fn_out_model net_algebraic+biases.tar
 ```
-which will produce a file `out_models/net_retrieve.tar`. 
+which will produce a file `out_models/net_algebraic+biases.tar`. 
+
+You can also adjust the command line arguments.
 
 Use the `-h` option in train.py to view all arguments:
 ```
@@ -52,12 +65,12 @@ optional arguments:
   --resume              Resume training from a previous checkpoint
 ```                       
 
-**Evaluating a model**   
-To evaluate the accuracy of this model after training, you can type:
+**Evaluating a model**  
+To evaluate the accuracy of this model after training, you can use do the following:
 ```python
-python eval.py --episode_type retrieve --fn_out_model net_retrieve.tar --max
+python eval.py --episode_type few_shot_gold --fn_out_model net_algebraic+biases.tar --max
 ```
-You can also evaluate the log-likelihood (--ll) and draw samples from the distribution on outputs (--sample).
+You can also evaluate the log-likelihood (--ll) and draw samples from the distribution on outputs (--sample). The "few_shot_gold" task is the same task provided to human participants.
 
 Use the `-h` option to view all arguments:
 ```
@@ -69,6 +82,8 @@ optional arguments:
                         Directory for loading the model file
   --max_length_eval MAX_LENGTH_EVAL
                         Maximum generated sequence length
+  --batch_size BATCH_SIZE
+                        Number of episodes in batch
   --episode_type EPISODE_TYPE
                         What type of episodes do we want? See datasets.py for
                         options
@@ -76,6 +91,8 @@ optional arguments:
   --ll                  Evaluate log-likelihood of validation (val) set
   --max                 Find best outputs for val commands (greedy decoding)
   --sample              Sample outputs for val commands
+  --sample_html         Sample outputs for val commands in html format (using
+                        unmap to canonical text)
   --sample_iterative    Sample outputs for val commands iteratively
   --fit_lapse           Fit the lapse rate
   --ll_nrep LL_NREP     Evaluate each episode this many times when computing
@@ -88,7 +105,7 @@ optional arguments:
 **Episode types**
 
 See datasets.py for the full set of options. Here are a few key episode types:
-- "algebraic+biases" : For training the full BIML model on few-shot grammar induction. Also has a validation set.
-- "algebraic_noise" : For training BIML (algebraic only). Also has a validation set.
-- "few_shot_gold" : For evaluating BIML and people on the same few-shot learning task. Validation set only.
-
+- "algebraic+biases" : Corresponds to "BIML" in Table 4B and main results
+- "algebraic_noise" : Corresponds to "BIML (algebraic only)" in Table 4B and main results
+- "retrieve" : Correspond to "BIML (copy only)" in Table 4B and main results
+- "few_shot_gold" : For evaluating BIML and people on the same few-shot learning task. This episode type provides the test set only.

@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: zup tufa lug OUT: color:#ff0000; color:#00b0b3; color:#33cc33;
+IN: zup blicket OUT: color:#ff0000; color:#0000ff;
+IN: kiki zup OUT: color:#ce9fcf; color:#ff0000;
+IN: zup zup OUT: color:#ff0000; color:#ff0000;
+IN: zup tufa zup OUT: color:#ff0000; color:#00b0b3; color:#ff0000;
+IN: lug tufa zup OUT: color:#33cc33; color:#00b0b3; color:#ff0000;
+IN: zup OUT: color:#ff0000;
+
+*GRAMMAR*

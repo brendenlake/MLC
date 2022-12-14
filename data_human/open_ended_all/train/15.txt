@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: lug lug OUT: color:#ff0000; color:#ff0000;
+IN: lug zup OUT: color:#ff0000; color:#b7b600;
+IN: fep gazzer lug OUT: color:#00b0b3; color:#0000ff; color:#ff0000;
+IN: lug gazzer fep OUT: color:#ff0000; color:#0000ff; color:#00b0b3;
+IN: lug gazzer lug OUT: color:#ff0000; color:#0000ff; color:#ff0000;
+IN: dax lug OUT: color:#ce9fcf; color:#ff0000;
+IN: lug OUT: color:#ff0000;
+
+*GRAMMAR*

@@ -1,0 +1,37 @@
+*SUPPORT*
+IN: 1 OUT: 1
+IN: 3 OUT: 3
+IN: 2 OUT: 2
+IN: DAX OUT: DAX
+IN: 2 after 3 OUT: 3 2
+IN: 1 after 2 OUT: 2 1
+IN: 2 thrice OUT: 2 2 2
+IN: 2 surround 3 OUT: 2 3 2
+IN: 1 thrice OUT: 1 1 1
+IN: 3 surround 1 OUT: 3 1 3
+IN: 2 thrice after 3 OUT: 3 2 2 2
+IN: 3 after 1 surround 2 OUT: 1 2 1 3
+IN: 2 after 3 thrice OUT: 3 3 3 2
+IN: 3 surround 1 after 2 OUT: 2 3 1 3
+
+*QUERY*
+IN: 3 after DAX OUT: DAX 3
+IN: DAX after 1 OUT: 1 DAX
+IN: DAX thrice OUT: DAX DAX DAX
+IN: 1 surround DAX OUT: 1 DAX 1
+IN: DAX surround 2 OUT: DAX 2 DAX
+IN: 2 after 3 surround DAX OUT: 3 DAX 3 2
+IN: DAX thrice after 2 OUT: 2 DAX DAX DAX
+IN: 3 after DAX thrice OUT: DAX DAX DAX 3
+IN: DAX surround DAX after DAX thrice OUT: DAX DAX DAX DAX DAX DAX
+IN: DAX surround 3 after 1 thrice OUT: 1 1 1 DAX 3 DAX
+
+*GRAMMAR*
+1 -> 1
+3 -> 3
+2 -> 2
+DAX -> DAX
+u1 thrice -> [u1] [u1] [u1]
+u1 surround u2 -> [u1] [u2] [u1]
+x1 after x2 -> [x2] [x1]
+u1 x1 -> [u1] [x1]

@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: fep dax fep OUT: color:#33cc33; color:#ff0000; color:#33cc33;
+IN: fep fep OUT: color:#33cc33; color:#33cc33;
+IN: kiki dax fep OUT: color:#00b0b3; color:#ff0000; color:#33cc33;
+IN: fep dax kiki OUT: color:#33cc33; color:#ff0000; color:#00b0b3;
+IN: fep OUT: color:#33cc33;
+IN: zup fep OUT: color:#0000ff; color:#33cc33;
+IN: fep wif OUT: color:#33cc33; color:#b7b600;
+
+*GRAMMAR*

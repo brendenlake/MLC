@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: blicket lug zup OUT: color:#00b0b3; color:#b7b600; color:#ce9fcf;
+IN: zup OUT: color:#ce9fcf;
+IN: zup zup OUT: color:#ce9fcf; color:#ce9fcf;
+IN: zup lug zup OUT: color:#ce9fcf; color:#b7b600; color:#ce9fcf;
+IN: zup lug blicket OUT: color:#ce9fcf; color:#b7b600; color:#00b0b3;
+IN: kiki zup OUT: color:#ff0000; color:#ce9fcf;
+IN: zup fep OUT: color:#ce9fcf; color:#0000ff;
+
+*GRAMMAR*

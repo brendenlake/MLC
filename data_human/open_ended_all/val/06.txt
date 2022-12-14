@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: dax lug wif OUT: color:#0000ff; color:#33cc33; color:#ff0000;
+IN: tufa dax OUT: color:#b7b600; color:#0000ff;
+IN: dax lug dax OUT: color:#0000ff; color:#33cc33; color:#0000ff;
+IN: dax dax OUT: color:#0000ff; color:#0000ff;
+IN: dax OUT: color:#0000ff;
+IN: dax fep OUT: color:#0000ff; color:#00b0b3;
+IN: wif lug dax OUT: color:#ff0000; color:#33cc33; color:#0000ff;
+
+*GRAMMAR*

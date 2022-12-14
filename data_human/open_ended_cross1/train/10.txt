@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: gazzer lug OUT: color:#ce9fcf; color:#0000ff;
+IN: lug OUT: color:#0000ff;
+IN: lug wif lug OUT: color:#0000ff; color:#b7b600; color:#0000ff;
+IN: lug tufa OUT: color:#0000ff; color:#33cc33;
+IN: lug lug OUT: color:#0000ff; color:#0000ff;
+IN: blicket wif lug OUT: color:#00b0b3; color:#b7b600; color:#0000ff;
+IN: lug wif blicket OUT: color:#0000ff; color:#b7b600; color:#00b0b3;
+
+*GRAMMAR*

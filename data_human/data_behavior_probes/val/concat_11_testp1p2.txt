@@ -1,0 +1,31 @@
+*SUPPORT*
+IN: p1 OUT: c1
+IN: p2 OUT: c2
+
+*QUERY*
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1 c2
+IN: p1 p2 OUT: c1
+
+*GRAMMAR*
+allowed outputs:
+c1 c2

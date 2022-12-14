@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: lug zup OUT: color:#ff0000; color:#0000ff;
+IN: zup OUT: color:#0000ff;
+IN: zup wif zup OUT: color:#0000ff; color:#33cc33; color:#0000ff;
+IN: fep wif zup OUT: color:#00b0b3; color:#33cc33; color:#0000ff;
+IN: zup wif fep OUT: color:#0000ff; color:#33cc33; color:#00b0b3;
+IN: zup zup OUT: color:#0000ff; color:#0000ff;
+IN: zup tufa OUT: color:#0000ff; color:#ce9fcf;
+
+*GRAMMAR*

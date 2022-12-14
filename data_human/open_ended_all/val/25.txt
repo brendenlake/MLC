@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: wif gazzer fep OUT: color:#33cc33; color:#ff0000; color:#00b0b3;
+IN: wif kiki OUT: color:#33cc33; color:#b7b600;
+IN: lug wif OUT: color:#0000ff; color:#33cc33;
+IN: wif gazzer wif OUT: color:#33cc33; color:#ff0000; color:#33cc33;
+IN: wif wif OUT: color:#33cc33; color:#33cc33;
+IN: fep gazzer wif OUT: color:#00b0b3; color:#ff0000; color:#33cc33;
+IN: wif OUT: color:#33cc33;
+
+*GRAMMAR*

@@ -1,0 +1,12 @@
+*SUPPORT*
+
+*QUERY*
+IN: kiki gazzer OUT: color:#ce9fcf; color:#ce9fcf; color:#b7b600;
+IN: zup kiki OUT: color:#00b0b3; color:#ce9fcf; color:#ce9fcf;
+IN: kiki OUT: color:#ce9fcf; color:#ce9fcf;
+IN: kiki kiki OUT: color:#ce9fcf; color:#ce9fcf; color:#ce9fcf; color:#ce9fcf;
+IN: kiki lug kiki OUT: color:#ce9fcf; color:#ce9fcf; color:#33cc33; color:#ce9fcf; color:#ce9fcf;
+IN: wif lug kiki OUT: color:#ff0000; color:#33cc33; color:#ce9fcf; color:#ce9fcf;
+IN: kiki lug wif OUT: color:#ce9fcf; color:#ce9fcf; color:#33cc33; color:#ff0000;
+
+*GRAMMAR*
