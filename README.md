@@ -2,8 +2,9 @@
 
 BIML is a meta-learning approach for guiding neural networks to human-like systematic generalization and inductive biases, through high-level guidance or direct human examples. This code shows how to train and evaluate a sequence-to-sequence (seq2seq) transformer in PyTorch to implement BIML through memory-based meta-learning.
 
-This code accompanies the following submitted paper. You can email brenden AT nyu DOT edu if you would like a copy.
+This code accompanies the following submitted paper.
 - Lake, B. M. and Baroni, M. (submitted). Human-like systematic generalization through a meta-learning neural network. 
+You can email brenden AT nyu.edu if you would like a copy.
 
 ### Credits
 This repo borrows from the excellent [PyTorch seq2seq tutorial](https://pytorch.org/tutorials/beginner/translation_transformer.html).
@@ -21,19 +22,20 @@ To get the episodes used for meta-training, you should download the following [z
 To get the top pre-trained models, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-*.pt`.
 
 ### Evaluating models
-There are many ways to evaluate a model after training.
+There are many different ways to evaluate a model after training. Here are a few examples.
 
-**Predicting algebraic outputs on few-shot learning**
-Here we find the best response from the model using greedy decoding:
+**Predicting algebraic outputs on few-shot learning task**  
+Here we find the best response from the pre-trained BIML model using greedy decoding:
 ```python
 python eval.py  --max --episode_type few_shot_gold --fn_out_model net-BIML-top.pt --verbose
 ```
 
-**Predicting human responses on few-shot learning**
+**Predicting human responses on few-shot learning task**
+Here we evaluate the log-likelihood of the human data:
 ```python
 python eval.py  --ll --ll_nrep 100 --episode_type few_shot_human --ll_p_lapse 0.03 --fn_out_model net-BIML-top.pt
 ```
-To evaluate the log-likelihood all models and reproduce Figure 4B in the manuscript, you can run this several times with these arguments. Please note that due to system/version differences the log-likelihood values may very slightly from the paper.
+To evaluate the log-likelihood of all models and to reproduce Figure 4B in the manuscript, you can run this command for the various models (see table below). Please note that due to system/version differences the log-likelihood values may vary in minor ways from the paper. Note that the basic seq2seq model requires `--episode_type human_vanilla`
 | --fn_out_model            | --ll_p_lapse |
 |---------------------------|--------------|
 | net-basic-seq2seq-top.pt  | 0.9          |
@@ -122,5 +124,5 @@ Please see `datasets.py` for the full set of options. Here are a few key episode
 - `algebraic+biases` : Corresponds to "BIML" in Table 4B and main results
 - `algebraic_noise` : Corresponds to "BIML (algebraic only)" in Table 4B and main results
 - `retrieve` : Correspond to "BIML (copy only)" in Table 4B and main results
-- `few_shot_gold` : For evaluating BIML on the few-shot learning task. This episode type provides the test set only.
-- `few_shot_human` : For evaluating BIML on predicting human responses on the few-shot learning task. This episode type provides the test set only.
+- `few_shot_gold` : For evaluating BIML on the gold algebraic responses for the few-shot learning task. This episode type provides the test set only.
+- `few_shot_human` : For evaluating BIML on predicting human responses for the few-shot learning task. This episode type provides the test set only.
