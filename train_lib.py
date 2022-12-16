@@ -31,9 +31,9 @@ def display_input_output(input_patterns,output_patterns,target_patterns):
     # Verbose printing of query items
     # 
     # Input
-    #   input_patterns : list of input sequences (query inputs; each in list form)
-    #   output_patterns : list of predicted output sequences (query outputs; each in list form)
-    #   target_patterns : list of targets (query outputs; each in list form)
+    #   input_patterns : list of input sequences (query inputs; each sequence is in list form)
+    #   output_patterns : list of predicted output sequences (query outputs; each sequence is in list form)
+    #   target_patterns : list of targets (query outputs; each sequence is in list form)
     nq = len(input_patterns)
     if nq == 0:
         print('     no patterns')
@@ -74,10 +74,12 @@ def timeSince(since, percent):
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))  
 
 def list_remap(list_old,list_source,list_target):
+    #  For a given list, replace each token in "source" with the corresponding token in "target"
+    # 
     # Input
-    #  list_old : list of words where we will check each for a remap
-    #  list_source : length k list of words to be replaced
-    #  list_target : length k list of words that will replace the source words
+    #  list_old : list of tokens where we will check each for a remap
+    #  list_source : length k list of tokens to be replaced
+    #  list_target : length k list of tokens that will replace the source tokens
     assert(len(list_source)==len(list_target))
     mydict = dict(zip(list_source,list_target))
     list_new = deepcopy(list_old)
@@ -94,14 +96,14 @@ def assert_consist_langs(langs_new,langs_old):
         assert(langs_old['output'].symbol2index[s] == langs_new['output'].symbol2index[s])
 
 def score_grammar(G,sample,mytype):
-    # For a given grammar G, compute the accuracy on the support or query set.
+    # For a given grammar symbolic G, compute the accuracy in solving the support examples or query examples.
     #
-    # This code assumes that all of the candidate examples are in the "query set",
+    # This code assumes that all of the candidate examples in "sample" are in the "query set",
     # and it figures out which are in the support set too by checking the support set
     #
     # Input
     #  G : candidate grammar
-    #  sample : current episode
+    #  sample : dict representing current episode
     #  mytype : do we want to score on the "support" or "query" examples?
     #
     # Output

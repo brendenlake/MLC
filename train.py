@@ -17,7 +17,7 @@ def train(batch, net, loss_fn, optimizer, langs):
     # Update the model for one batch (which is a set of episodes)
     #
     # Input
-    #   batch : output from dat.make_biml_batch
+    #   batch : dict output from dat.make_biml_batch
     #   net : BIML model
     #   loss_fn : loss function
     #   optimizer : torch optimizer (AdamW)
@@ -48,7 +48,7 @@ def save_checkpoint(fn_out_model, step, epoch, net, optimizer, scheduler_epoch, 
     #  train_tracker : array that stores losses over training
     #  best_val_loss : best validation loss so far (if using --save_best)
     #  params : list of hyperpameters
-    #  is_best : special filename if best file so far  ... 'filename_best.pt
+    #  is_best : special filename if best file so far  ... 'filename_best.pt'
     if is_best:
         s = fn_out_model.rsplit('.',1) # split off extension 
         fn_out_model = s[0] + '_best.' + s[1]
@@ -67,6 +67,9 @@ def save_checkpoint(fn_out_model, step, epoch, net, optimizer, scheduler_epoch, 
     print(' < Done. >')
 
 def load_checkpoint(fn_out_model, net, optimizer, scheduler_epoch, params):
+    # Note that the command line args must be the same now as when model was saved.
+    #  (Except for 'resume' parameter)
+    #
     # Input
     #  fn_out_model : filename for model to resume
     # ...
@@ -110,7 +113,7 @@ if __name__ == "__main__":
     parser.add_argument('--nlayers_decoder', type=int, default=3, help='number of layers for decoder')
     parser.add_argument('--emb_size', type=int, default=128, help='size of embedding')
     parser.add_argument('--ff_mult', type=int, default=4, help='multiplier for size of the fully-connected layer in transformer')
-    parser.add_argument('--dropout', type=float, default=0.1, help=' dropout applied to embeddings and transformer')        
+    parser.add_argument('--dropout', type=float, default=0.1, help='dropout applied to embeddings and transformer')        
     parser.add_argument('--act', type=str, default='gelu', help='activation function in the fully-connected layer of the transformer (relu or gelu)')
     parser.add_argument('--save_best', default=False, action='store_true', help='Save the "best model" according to validation loss.')
     parser.add_argument('--save_best_skip', type=float, default=0.2, help='Do not bother saving the "best model" for this fraction of early training')

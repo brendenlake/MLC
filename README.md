@@ -2,7 +2,7 @@
 
 BIML is a meta-learning approach for guiding neural networks to human-like systematic generalization and inductive biases, through high-level guidance or direct human examples. This code shows how to train and evaluate a sequence-to-sequence (seq2seq) transformer in PyTorch to implement BIML through memory-based meta-learning.
 
-This code accompanies the following submitted paper:
+This code accompanies the following submitted paper. You can email brenden AT nyu DOT edu if you would like a copy.
 - Lake, B. M. and Baroni, M. (submitted). Human-like systematic generalization through a meta-learning neural network. 
 
 ### Credits
@@ -10,24 +10,76 @@ This repo borrows from the excellent [PyTorch seq2seq tutorial](https://pytorch.
 
 ### Requirements
 Python 3 with the following packages:
-torch, sklearn, numpy, matplotlib
+torch (PyTorch), sklearn (scikit-learn), numpy, matplotlib
 
+### Downloading data and pre-trained models
 
-### Using the code
+**Meta-training data**  
+To get the episodes used for meta-training, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/data_algebraic.zip) with the 100K meta-training episodes. Please extract `data_algebraic.zip` such that `data_algebraic`is a sub-directory of the main repo.
 
-**Downloading the meta-training episodes**  
-For training BIML on few-shot learning, you need to download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/data_algebraic.zip) with the 100K meta-training episodes. Please extract `data_algebraic.zip` such that `data_algebraic`is a sub-directory of the main repository directory.
+**Pre-trained models**  
+To get the top pre-trained models, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-*.pt`.
 
-**Training a model**   
-To train BIML on few-shot learning (BIML model in Fig. 2 and Table 4B), you can run the command:
+### Evaluating models
+There are many ways to evaluate a model after training.
+
+**Predicting algebraic outputs on few-shot learning**
+Here we find the best response from the model using greedy decoding:
 ```python
-python train.py --episode_type algebraic+biases --fn_out_model net_algebraic+biases.tar
+python eval.py  --max --episode_type few_shot_gold --fn_out_model net-BIML-top.pt --verbose
 ```
-which will produce a file `out_models/net_algebraic+biases.tar`. 
 
-You can also adjust the command line arguments.
+**Predicting human responses on few-shot learning**
+```python
+python eval.py  --ll --ll_nrep 100 --episode_type few_shot_human --ll_p_lapse 0.03 --fn_out_model net-BIML-top.pt
+```
+To evaluate the log-likelihood all models and reproduce Figure 4B in the manuscript, you can run this several times with these arguments. Please note that due to system/version differences the log-likelihood values may very slightly from the paper.
+| --fn_out_model            | --ll_p_lapse |
+|---------------------------|--------------|
+| net-basic-seq2seq-top.pt  | 0.9          |
+| net-BIML-copy-top.pt      | 0.5          |
+| net-BIML-algebraic-top.pt | 0.1          |
+| net-BIML-joint-top.pt     | 0.03         |
+| net-BIML-top.pt           | 0.03         |
 
-Use the `-h` option in train.py to view all arguments:
+The full set of arguments can be viewed with when typing `python eval.py -h`:
+```
+optional arguments:
+  -h, --help            show this help message and exit
+  --fn_out_model FN_OUT_MODEL
+                        *REQUIRED*. Filename for loading the model
+  --dir_model DIR_MODEL
+                        Directory for loading the model file
+  --max_length_eval MAX_LENGTH_EVAL
+                        Maximum generated sequence length
+  --batch_size BATCH_SIZE
+                        Number of episodes in batch
+  --episode_type EPISODE_TYPE
+                        What type of episodes do we want? See datasets.py for
+                        options
+  --dashboard           Showing loss curves during training.
+  --ll                  Evaluate log-likelihood of validation (val) set
+  --max                 Find best outputs for val commands (greedy decoding)
+  --sample              Sample outputs for val commands
+  --sample_html         Sample outputs for val commands in html format (using
+                        unmap to canonical text)
+  --sample_iterative    Sample outputs for val commands iteratively
+  --fit_lapse           Fit the lapse rate
+  --ll_nrep LL_NREP     Evaluate each episode this many times when computing
+                        log-likelihood (needed for stochastic remappings)
+  --ll_p_lapse LL_P_LAPSE
+                        Lapse rate when evaluating log-likelihoods
+  --verbose             Inspect outputs in more detail
+```
+
+### Training models
+To train BIML on few-shot learning (as in the BIML model in Fig. 2 and Table 4B), you can run the train command with default arguments:
+```python
+python train.py --episode_type algebraic+biases --fn_out_model net-BIML.pt
+```
+which will produce a file `out_models/net-BIML.pt`. 
+
+Use `python train.py -h` to view all possible arguments:
 ```
 optional arguments:
   -h, --help            show this help message and exit
@@ -65,47 +117,10 @@ optional arguments:
   --resume              Resume training from a previous checkpoint
 ```                       
 
-**Evaluating a model**  
-To evaluate the accuracy of this model after training, you can use do the following:
-```python
-python eval.py --episode_type few_shot_gold --fn_out_model net_algebraic+biases.tar --max
-```
-You can also evaluate the log-likelihood (--ll) and draw samples from the distribution on outputs (--sample). The "few_shot_gold" task is the same task provided to human participants.
-
-Use the `-h` option to view all arguments:
-```
-optional arguments:
-  -h, --help            show this help message and exit
-  --fn_out_model FN_OUT_MODEL
-                        *REQUIRED*. Filename for loading the model
-  --dir_model DIR_MODEL
-                        Directory for loading the model file
-  --max_length_eval MAX_LENGTH_EVAL
-                        Maximum generated sequence length
-  --batch_size BATCH_SIZE
-                        Number of episodes in batch
-  --episode_type EPISODE_TYPE
-                        What type of episodes do we want? See datasets.py for
-                        options
-  --dashboard           Showing loss curves during training.
-  --ll                  Evaluate log-likelihood of validation (val) set
-  --max                 Find best outputs for val commands (greedy decoding)
-  --sample              Sample outputs for val commands
-  --sample_html         Sample outputs for val commands in html format (using
-                        unmap to canonical text)
-  --sample_iterative    Sample outputs for val commands iteratively
-  --fit_lapse           Fit the lapse rate
-  --ll_nrep LL_NREP     Evaluate each episode this many times when computing
-                        log-likelihood (needed for stochastic remappings)
-  --ll_p_lapse LL_P_LAPSE
-                        Lapse rate when evaluating log-likelihoods
-  --verbose             Inspect outputs in more detail
-```
-
-**Episode types**
-
-See datasets.py for the full set of options. Here are a few key episode types:
-- "algebraic+biases" : Corresponds to "BIML" in Table 4B and main results
-- "algebraic_noise" : Corresponds to "BIML (algebraic only)" in Table 4B and main results
-- "retrieve" : Correspond to "BIML (copy only)" in Table 4B and main results
-- "few_shot_gold" : For evaluating BIML and people on the same few-shot learning task. This episode type provides the test set only.
+### Episode types
+Please see `datasets.py` for the full set of options. Here are a few key episode types that can be set via `--episode_type`:
+- `algebraic+biases` : Corresponds to "BIML" in Table 4B and main results
+- `algebraic_noise` : Corresponds to "BIML (algebraic only)" in Table 4B and main results
+- `retrieve` : Correspond to "BIML (copy only)" in Table 4B and main results
+- `few_shot_gold` : For evaluating BIML on the few-shot learning task. This episode type provides the test set only.
+- `few_shot_human` : For evaluating BIML on predicting human responses on the few-shot learning task. This episode type provides the test set only.

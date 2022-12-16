@@ -10,7 +10,8 @@ from datasets import Lang, flip, make_hashable, bundle_biml_episode, input_symbo
 from train_lib import seed_all
 from interpret_grammar import str_to_grammar, Grammar, Rule, get_grammar_miniscan
 
-DEBUG = False
+# For generating a dataset of meta-training episodes, for teaching BIML to do few-shot learning of algebraic systems.
+# This is not needed if you are okay training on the existing 100K episodes which can be downloaded.
 
 p_lhs_onearg = 0.5 # Probability that we have a single argument function in grammar. Otherwise, we have two arguments
 p_stop_rhs = 0.6 # Probability of stopping instead of generating more variables in the right hand side of a rule
@@ -36,7 +37,6 @@ def generate_rules_dataset(nsamp_train,nsamp_val,mydir='data_algebraic',episode_
     os.mkdir(mydir+'/train')
     os.mkdir(mydir+'/val')
     generate_episode_train, _ = get_episode_generator(episode_type)
-    if DEBUG: sample = generate_episode_train([])
     
     print( "Generating validation episodes")
     tabu_list = []
@@ -100,11 +100,7 @@ def get_episode_generator(episode_type):
     # Output
     #  generate_episode_train: function handle for generating episodes
     #  generate_episode_test: function handle for generating episodes
-    if episode_type == 'rules++':
-        assert DEBUG # this is for comparison with legacy code only
-        generate_episode_train = lambda tabu_episodes : generate_rules_episode(nsupport=15,nquery=10,nprims=4,nrules=3,tabu_list=tabu_episodes,maxlen=8)
-        generate_episode_test = generate_episode_train
-    elif episode_type == 'algebraic':
+    if episode_type == 'algebraic':
         generate_episode_train = lambda tabu_episodes : generate_rules_episode(nsupport=14,nquery=10,nprims=4,nrules=3,tabu_list=tabu_episodes,maxlen=8)
         generate_episode_test = generate_episode_train
     else:
@@ -154,9 +150,9 @@ def generate_random_rules(nprims,nrules,input_symbols,output_symbols,max_len):
 	# Input
 	#   nprims : number of primitives
 	#   nrules : number of rules
-	#   input_symbols : available input symbols for grammar LHS
-	#   output_symbols : available output symbols for mapping primitives to outputs
-	#   max_len : maximum length of RHS of rule
+	#   input_symbols : available input symbols for grammar (LHS of rules)
+	#   output_symbols : available output symbols for mapping input primitives to output primitives
+	#   max_len : maximum length of RHS of rules
 	#
 	assert(nprims+nrules <= len(input_symbols))
 	input_symbol_options = deepcopy(input_symbols) 
@@ -169,7 +165,7 @@ def generate_random_rules(nprims,nrules,input_symbols,output_symbols,max_len):
 		LHS,used_vars_lhs = sample_LHS(input_symbol)		
 		RHS = sample_RHS(used_vars_lhs,max_len)
 		rules.append(Rule(LHS,RHS))
-	# once we have all the sampled rules, add a default rule
+	# once we have all the sampled rules, add a default concatenation rule
 	rules.append(icon_concat_rule)
 	return Grammar(rules,input_symbols)
 
@@ -186,7 +182,7 @@ def generate_prims(nprims,input_symbol_options,output_symbol_options):
 	return rules, input_symbol_options[nprims:]
 
 def sample_LHS(func_name):
-	# Sample a left-hand-side that is either a one (x func_name) or two (x func_name x) argument rule
+	# Sample a left-hand-side (LHS) that is either a one (x func_name) or two (x func_name x) argument rule
 	# Return as string
 	assert(isinstance(func_name,str))
 	vars_options = random_stitch(vars_atom,vars_string)
@@ -200,7 +196,7 @@ def sample_LHS(func_name):
 
 def sample_RHS(vars_in_lhs, max_len, min_len=2):
 	#  Sample a right-hand-side (RHS) for some arbitrary mix of the LHS variables.
-	#    Note that the maximum length of the RHS must be two variables
+	#    Note that the minimum length of the RHS must be two variables.
 	#
 	# Input
 	#   vars_in_lhs : variables that were used to construct the left hand side
@@ -296,71 +292,8 @@ def sample_from_pcfg(CFG,maxlen):
 			break
 	return mystr
 
-def debug():
-
-	print('Choose primitives:')
-	rules, leftovers = generate_prims(2,['a','b','c','d'],['A','B','C','D'])
-	for r in rules: print(' ',r)
-	print(' leftovers',leftovers)
-
-	print('Sample rules:')
-	for _ in range(5):
-		LHS,used_vars_lhs = sample_LHS('blicket')		
-		RHS = sample_RHS(used_vars_lhs,max_len=8)
-		R = Rule(LHS,RHS)
-		R.set_primitives(input_symbols_list_default)
-		print(' ',R)
-
-	print('Random stitch:')
-	for _ in range(5):
-		print(' ',random_stitch(['a','b','c'],['(1)','(2)','(3)','(4)']))
-
-	from interpret_grammar import get_grammar_miniscan
-	G = get_grammar_miniscan()
-	print('MiniSCAN grammar:')
-	print(G)
-	CFG = make_pcfg_for_data_gen(G)
-	print('\nCFG for producing examples',CFG)
-	examples = sample_examples(20,G,8,8)
-	print('\nGenerated examples from MiniSCAN:')
-	for pair in examples:
-		print(pair[0],'->',pair[1])
-
-	print('\nChecking that we can detect equivalence to MiniSCAN...')
-	G1_str = 'blicket -> GREEN \n tufa -> BLUE \n zup -> YELLOW \n wif -> RED \n x1 fep x2 -> [x2] [x1] \n u1 lug -> [u1] [u1] [u1] \n u1 kiki u2 -> [u1] [u2] [u1] \n u1 x1 -> [u1] [x1]'
-	G2_str = 'fep -> RED \n zup -> PINK \n lug -> PURPLE \n kiki -> BLUE \n x1 dax x2 -> [x2] [x1] \n u1 gazzer x1 -> [u1] [x1] [u1] \n x1 wif -> [x1] [x1] [x1] \n u1 x1 -> [u1] [x1]'
-	G3_str = 'fep -> RED \n zup -> PINK \n lug -> PURPLE \n kiki -> BLUE \n u1 dax x1 -> [x1] [u1] \n u1 gazzer x1 -> [u1] [x1] [u1] \n x1 wif -> [x1] [x1] [x1] \n u1 x1 -> [u1] [x1]'
-	assert(equiv_to_miniscan(G1_str))
-	assert(not equiv_to_miniscan(G2_str))
-	assert(not equiv_to_miniscan(G3_str))
-	assert(equiv_to_miniscan(str(G)))
-	print("  Test passed.")
-
 if __name__ == "__main__":
 
+	# For generating the meta-training dataset in paper
 	seed_all()
 	generate_rules_dataset(100000,200,mydir='data_algebraic',episode_type='algebraic')
-
-	# debug()
-
-    # nsamp_train = 500
-    # nsamp_val = 10
-    # DEBUG = True
-    # seed_all()
-    # generate_rules_dataset(nsamp_train,nsamp_val,'data_temp',episode_type='rules++')
-
-    # # import debug_datasets as debug
-    # shutil.rmtree('data_temp2', ignore_errors=True)
-    # seed_all()
-    # import debug_datasets
-    # debug_datasets.generate_rules_dataset(nsamp_train,nsamp_val,mydir='data_temp2',episode_type='rules++')
-
-    # text_files_v1 = glob.glob('data_temp/*/*.txt')
-    # text_files_v2 = [f.replace('data_temp','data_temp2') for f in text_files_v1]
-    # for i in range(len(text_files_v1)):
-    # 	if not filecmp.cmp(text_files_v1[i],text_files_v2[i]):
-    # 		print(text_files_v1[i],'and',text_files_v2[i],'dot not match')
-    # 		assert False # files do not match
-    # print('* DEBUG* All files match!')
-    # shutil.rmtree('data_temp')
-    # shutil.rmtree('data_temp2')
