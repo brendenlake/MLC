@@ -30,7 +30,7 @@ Here we find the best response from the pre-trained BIML model using greedy deco
 python eval.py  --max --episode_type few_shot_gold --fn_out_model net-BIML-top.pt --verbose
 ```
 
-**Predicting human responses on few-shot learning task**
+**Predicting human responses on few-shot learning task**  
 Here we evaluate the log-likelihood of the human data:
 ```python
 python eval.py  --ll --ll_nrep 100 --episode_type few_shot_human --ll_p_lapse 0.03 --fn_out_model net-BIML-top.pt
