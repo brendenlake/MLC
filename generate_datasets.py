@@ -294,6 +294,6 @@ def sample_from_pcfg(CFG,maxlen):
 
 if __name__ == "__main__":
 
-	# For generating the meta-training dataset in paper
+	# For generating the entire meta-training dataset in the paper
 	seed_all()
 	generate_rules_dataset(100000,200,mydir='data_algebraic',episode_type='algebraic')

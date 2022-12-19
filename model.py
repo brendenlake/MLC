@@ -59,7 +59,7 @@ class BIML(nn.Module):
         #  PAD_idx_input : index of padding in input sequences
         #  PAD_idx_output : index of padding in output sequences
         #  nlayers_encoder : number of transformer encoder layers
-        #  nlayers_decoder : number of transformer decoder layers (likely fewer than encoder for tasks with deterministic outputs)
+        #  nlayers_decoder : number of transformer decoder layers
         #  nhead : number of heads for multi-head attention
         #  dropout_p : dropout applied to symbol embeddings and transformer layers
         #  ff_mult : multiplier for hidden size of feedforward network
@@ -85,20 +85,11 @@ class BIML(nn.Module):
         self.output_embedding = nn.Embedding(output_size, hidden_size)
         self.out = nn.Linear(hidden_size,output_size)
 
-    def expand_embeddings(self):
-        # Add a new dimension/symbol to the embeddings
-        old_input_embed = self.input_embedding.weight.data
-        old_output_embed = self.output_embedding.weight.data
-        self.input_embedding = nn.Embedding(self.input_size+1, self.hidden_size)
-        self.output_embedding = nn.Embedding(self.output_size+1, self.hidden_size)
-        self.input_embedding.weight.data[:-1,:] = old_input_embed
-        self.output_embedding.weight.data[:-1,:] = old_output_embed
-
     def prep_encode(self, xq_context_padded):
         # Embed source sequences and make masks
         # 
         # Input
-        #  xq_context_padded : input strings as indices # batch_size x maxlen_src
+        #  xq_context_padded : source sequences via token index # b*nq (batch_size) x maxlen_src
         xq_context_embed = self.input_embedding(xq_context_padded) # batch_size x maxlen_src x emb_size
 
         # Add positional encoding to input embeddings
@@ -136,8 +127,8 @@ class BIML(nn.Module):
         # Forward pass through encoder and decoder
         # 
         # Input
-        #  z_padded : tensor of size [b*nq (batch_size), maxlen_target] : indices for decoder input
-        #  batch : struct from datasets.make_biml_batch() : includes encoder inputs
+        #  z_padded : tensor of size [b*nq (batch_size), maxlen_target] : decoder input via token index
+        #  batch : struct via datasets.make_biml_batch(), which includes source sequences
         # 
         # Output
         #   output : [b*nq x maxlen_target x output_size]

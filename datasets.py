@@ -13,7 +13,8 @@ from interpret_grammar import str_to_grammar, Grammar, Rule, get_grammar_minisca
 from itertools import permutations
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-DEBUG = False # compare outputs with legacy code
+# Generating episodes for meta-training and evaluation. 
+#   Includes code for few-shot learning tasks, open-ended tasks, and additional probes of biases.
 
 # Special symbols
 SOS_token = "SOS" # start of sentence
@@ -30,104 +31,104 @@ def get_dataset(episode_type):
 # --------------------------------------------
 # Datasets for main experiments
 # --------------------------------------------
-    if episode_type == 'retrieve':
+    if episode_type == 'retrieve': # BIML (copy only) training
         D_train = DataRetrieve('train',mydir='data_algebraic', min_ns=14, max_ns=14)
         D_val = DataRetrieve('val',mydir='data_algebraic', min_ns=14, max_ns=14)
-    elif episode_type == 'algebraic':
+    elif episode_type == 'algebraic': # not used in paper
         D_train = DataAlg('train',mydir='data_algebraic', min_ns=14)
         D_val = DataAlg('val',mydir='data_algebraic')
-    elif episode_type == 'algebraic_noise':
+    elif episode_type == 'algebraic_noise': # BIML (algebraic only) training
         D_train = DataAlg('train',mydir='data_algebraic', p_noise=0.01, min_ns=14)
         D_val = DataAlg('val',mydir='data_algebraic')
-    elif episode_type == 'algebraic+biases':
+    elif episode_type == 'algebraic+biases': # BIML training
         D_train = DataAlgAndBias('train',mydir='data_algebraic',p_noise=0.01, min_ns=14)
         D_val = DataAlg('val',mydir='data_algebraic')
-    elif episode_type=='few_shot_gold':
+    elif episode_type=='few_shot_gold': # For evaluating few-shot learning task with gold outputs
         D_train = []
         D_val = DataHumanFewShot('gold', inc_support_in_query=True, do_remap=True)
-    elif episode_type=='few_shot_human': # previously 'miniscan_behavior'
+    elif episode_type=='few_shot_human': # For evaluating predictions of human behavior on few-shot learning task
         D_train = []
         D_val = DataHumanFewShot('behavior', data_mult=1, inc_support_in_query=False, do_remap=True)
-    elif episode_type=='few_shot_human_mult10': # same dataset copied 10 times
+    elif episode_type=='few_shot_human_mult10': # same dataset as above copied 10 times
         D_train = []
         D_val = DataHumanFewShot('behavior', data_mult=10, inc_support_in_query=False, do_remap=True)    
-    elif episode_type=='open_end_human_all': # previously 'behavior_worksheet'
+    elif episode_type=='open_end_human_all': # complete set of human open-ended responses
         D_train = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_all')
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_all')
         D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_all')
-    elif episode_type=='open_end_freeform': # previously freeform_worksheet'
+    elif episode_type=='open_end_freeform': # for evaluating model productions on open-ended task
         D_train = []
         D_val = DataFreeformOpenEnded(mydir='data_human/open_ended_all/mock')
-    elif episode_type=='probe_human':
+    elif episode_type=='probe_human': # for evaluating predictions of human behavior on "additional biases" probe tasks (supplement)
         D_train = []
         D_val = DataHumanProbe('val',data_mult=10)
-    elif episode_type=='probe_human_w_pool':
+    elif episode_type=='probe_human_w_pool': # for training BIML (within-sample) on open-ended task
         D_train = DataHumanProbe('train',inc_pool=True)
         D_val = DataHumanProbe('val',data_mult=10,inc_pool=True)
-    elif episode_type=='few_shot_vanilla':
+    elif episode_type=='few_shot_vanilla': # Basic seq2seq training
         D_train = DataFewShotVanilla('train')
         D_val = DataFewShotVanilla('val')
-    elif episode_type=='human_vanilla':
+    elif episode_type=='human_vanilla': # Basic seq2seq for evaluating predictions of human behavio
         D_train = []
         D_val = DataHumanVanilla('behavior', data_mult=1, inc_support_in_query=False, do_remap=False)
 # --------------------------------------------
-# Datasets for cross-validation on open-ended task
+# Datasets for training and evaluating cross-validation on open-ended tasks.
+#  to generate responses on iterative open-ended task, you can uncomment out the last line of each
 # --------------------------------------------
     elif episode_type=='open_end_human_cross1':
         D_train = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross1')        
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross1')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross1')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross1')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross1')
     elif episode_type=='open_end_human_cross2':
         D_train = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross2')
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross2')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross2')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross2')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross2')
     elif episode_type=='open_end_human_cross3':
         D_train = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross3')
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross3')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross3')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross3')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross3')
     elif episode_type=='open_end_human_cross4':
         D_train = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross4')
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross4')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross4')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross4')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross4')
     elif episode_type=='open_end_human_cross5':
         D_train = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross5')
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross5')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross5')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross5')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross5')
     elif episode_type=='joint_cross1':
         D_train1 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=14)
         D_train2 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=0)
         D_train3 = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross1')
         D_train = MixDataset([D_train1,D_train2,D_train3])
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross1')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross1')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross1')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross1')
     elif episode_type=='joint_cross2':
         D_train1 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=14)
         D_train2 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=0)
         D_train3 = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross2')
         D_train = MixDataset([D_train1,D_train2,D_train3])
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross2')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross2')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross2')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross2')
     elif episode_type=='joint_cross3':
         D_train1 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=14)
         D_train2 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=0)
         D_train3 = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross3')
         D_train = MixDataset([D_train1,D_train2,D_train3])
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross3')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross3')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross3')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross3')
     elif episode_type=='joint_cross4':
         D_train1 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=14)
         D_train2 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=0)
         D_train3 = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross4')
         D_train = MixDataset([D_train1,D_train2,D_train3])
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross4')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross4')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross4')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross4')
     elif episode_type=='joint_cross5':
         D_train1 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=14)
         D_train2 = DataAlgAndBias('train',mydir='data_algebraic', p_noise=0.01, min_ns=0)
         D_train3 = DataHumanOpenEnded('train', inc_support_in_query=True, mydir='data_human/open_ended_cross5')
         D_train = MixDataset([D_train1,D_train2,D_train3])
-        # D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross5')
-        D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross5')
+        D_val = DataHumanOpenEnded('val', inc_support_in_query=False, mydir='data_human/open_ended_cross5')
+        # D_val = DataHumanOpenEndedIterative('val','data_human/open_ended_cross5')
 # --------------------------------------------
 # Legacy datasets for comparison with old code
 # --------------------------------------------
@@ -160,8 +161,8 @@ def update_lang_w_pad(mylang):
     return mylang
 
 class Lang:
-    #  Class for converting tokens to numerical indices, and vice versa.
-    #  Should use separate class for input and output languages
+    #  Class for converting tokens strings to token index, and vice versa.
+    #   Use separate class for input and output languages
     #
     def __init__(self, symbols):
         # symbols : list of all possible symbols besides special tokens SOS, EOS, and PAD
@@ -182,14 +183,14 @@ class Lang:
         assert(len(self.index2symbol)==len(self.symbol2index))
 
     def symbols_to_tensor(self, mylist, add_eos=True):
-        # Convert a list of symbols to a tensor of indices (adding a EOS token at end)
+        # Convert a list of token strings to token index (adding a EOS token at end)
         # 
         # Input
-        #  mylist  : list of m symbols
+        #  mylist  : list of m symbols as strings
         #  add_eos : true/false, if true add the EOS symbol at end
         #
         # Output
-        #  output : [m or m+1 LongTensor] indices of each symbol (plus EOS if appropriate)
+        #  output : [m or m+1 LongTensor] token index for each symbol (plus EOS if appropriate)
         mylist = copy(mylist)
         if add_eos: mylist.append(EOS_token)
         indices = [self.symbol2index[s] for s in mylist]
@@ -197,8 +198,8 @@ class Lang:
         return output
 
     def tensor_to_symbols(self, v):
-        # Convert tensor of indices to symbols, breaking where we get a EOS token.
-        #   The EOS token is not included at the end.
+        # Convert tensor of token index to token strings, breaking where we get a EOS token.
+        #   The EOS token is not included at the end in the result string list.
         # 
         # Input
         #  v : python list of m indices, or 1D tensor
@@ -256,7 +257,6 @@ def bundle_biml_episode(x_support,y_support,x_query,y_query,myhash,aux={}):
     # Bundle components for an episode suitable for optimizing BIML
     # 
     # Input
-    #  pad_spec : struct specifying padding length for 'input','output',and 'grammar'
     #  x_support [length ns list of lists] : input sequences (each a python list of words/symbols)
     #  y_support [length ns list of lists] : output sequences (each a python list of words/symbols)
     #  x_query [length nq list of lists] : input sequences (each a python list of words/symbols)
@@ -270,7 +270,7 @@ def bundle_biml_episode(x_support,y_support,x_query,y_query,myhash,aux={}):
     xy_support = [ITEM_SEP]
     for j in range(ns):
         xy_support += x_support[j] + [IO_SEP] + y_support[j] + [ITEM_SEP]
-    x_query_context = [item + xy_support for item in x_query] # Create the combined support context for every query
+    x_query_context = [item + xy_support for item in x_query] # Create the combined source sequence for every query
     sample = {}
     sample['identifier'] = myhash # unique identifying string for this episode (order invariant)
     sample['xs'] = x_support # support 
@@ -283,17 +283,21 @@ def bundle_biml_episode(x_support,y_support,x_query,y_query,myhash,aux={}):
 
 def make_biml_batch(samples, langs):
     # Batch episodes into a series of padded input and target tensors
+    # 
+    # Input
+    #  samples : list of dicts from bundle_biml_episode
+    #  langs : input and output version of Lang class
     assert isinstance(samples,list)
     m = len(samples)
     mybatch = {}
     mybatch['list_samples'] = samples
     mybatch['batch_size'] = m
-    mybatch['xq_context'] = [] # list of contextual query inputs (as lists) across all episodes
+    mybatch['xq_context'] = [] # list of source sequences (as lists) across all episodes
     mybatch['xq'] = []  # list of queries (as lists) across all episodes
     mybatch['yq'] = [] # list of query outputs (as lists) across all episodes
     mybatch['q_idx'] = [] # index of which episode each query belongs to
     mybatch['in_support'] = [] # bool list indicating whether each query is in its corresponding support set, or not
-    for idx in range(m):
+    for idx in range(m): # each episode
         sample = samples[idx]
         nq = len(sample['xq'])
         assert(nq == len(sample['yq']))
@@ -316,6 +320,8 @@ def set_batch_to_device(batch):
     return batch
 
 def get_batch_output_pool(batch):
+    # Optional info for certain tasks: Retrieve which symbols are allowed at output
+    #
     # Input
     #  batch : Output from make_biml_batch
     # Output
@@ -334,15 +340,14 @@ def build_padded_tensor(list_seq, lang, add_eos=True, add_sos=False):
     # Transform list of python lists to a padded torch tensors
     # 
     # Input
-    #  list_seq : list of n sequences (each sequence is a python list of symbols)
-    #  lang : language object for translation into indices
-    #  pad_length : the maximum size of any sequence, including special characters
+    #  list_seq : list of n sequences (each sequence is a python list of token srings)
+    #  lang : language object for translation of token string to token index
     #  add_eos : add end-of-sequence token at the end?
     #  add_sos : add start-of-sequence token at the beginning?
     #
     # Output
     #  z_padded : LongTensor (n x max_len)
-    #  z_lengths : python list of sequence lengths (list of scalars)
+    #  z_lengths : python list of sequence lengths (n-length list of scalars)
     n = len(list_seq)
     if n==0: return [],[]
     z_eos = list_seq
@@ -358,19 +363,19 @@ def build_padded_tensor(list_seq, lang, add_eos=True, add_sos=False):
     return z_padded,z_lengths
 
 def pad_seq(seq, max_length):
-    # Pad sequence with the PAD_token symbol to achieve max_length
+    # Pad token string sequence with the PAD_token symbol to achieve max_length
     #
     # Input
-    #  seq : list of symbols
+    #  seq : list of symbols (as strings)
     #
     # Output
     #  seq : padded list now extended to length max_length
     seq += (max_length - len(seq)) * [PAD_token]
-    # assert(len(seq)==max_length)
     return seq
 
 def make_hashable(G):
-    # Separate and sort stings, ensuring a unique string identifier for an episode
+    # Create unique identifier for episodes defined by a grammar.
+    #  Separate and sort rules in string format.
     #
     # Input
     #   G : string of elements separated by \n specifying the structure of an episode 
@@ -382,16 +387,22 @@ def make_hashable(G):
     return out.strip()
 
 def combine_input_output_symb(list_input_symb,list_output_symb):
-    # Make new vocabulary that combines list of input and output symbols.
-    #  Exclude EOS_token,SOS_token,PAD_token, which will be added automatically by Lang constructor
+    # Make new source vocabulary that combines list of input and output symbols.
+    #  Include input/output and item separators, IO_SEP,ITEM_SEP.
+    #  Exclude EOS_token,SOS_token,PAD_token, which will be added automatically by Lang constructor/
+    #
     # Input
-    #   list_input_symb : list of symbols (strings)
-    #   list_output_symb : 
+    #   list_input_symb : list of token symbols (strings)
+    #   list_output_symb : list of token symbols (strings)
+    # Output
+    #   comb : combined list of tokens as strings
     additional_symb = sorted(set([IO_SEP,ITEM_SEP])-set([EOS_token,SOS_token,PAD_token]))
     comb = sorted(set(list_input_symb + list_output_symb + additional_symb))
     return comb
 
 class DataAlg(Dataset):
+    # Meta-training for few-shot grammar learning (fully algebraic)
+
     def __init__(self, mode, mydir, p_noise=0., inc_support_in_query=True, min_ns=0):
         # Each episode has different latent (algebraic) grammar. 
         #  The number of support items picked uniformly from min_ns...max_ns
@@ -459,6 +470,7 @@ def add_response_noise(yq_item, p_noise, langs):
     return yq_item
 
 class DataRetrieve(DataAlg):
+    # Copy task of retrieving study examples
 
     def __init__(self, mode, mydir, min_ns=2, max_ns=2):
         # Each episode has a set of support strings, identical to DataAlg class
@@ -485,6 +497,7 @@ class DataRetrieve(DataAlg):
         return bundle_biml_episode(S['xs'],S['ys'],S['xq'],S['yq'],myhash,aux=aux)
 
 class DataAlgAndBias(DataAlg):
+    # Meta-training for full BIML model
 
     def __init__(self, mode, mydir, p_bias=0.2, p_noise=0., inc_support_in_query=True, min_ns=0):
         # Optimize for a combination of algebraic and bias-based outputs.
@@ -530,7 +543,7 @@ class DataAlgAndBias(DataAlg):
 
 
 def get_prims(xs,ys):
-    # Find each primitive (in support set) and what output symbols it maps to
+    # Find each primitive token (in support set) and what output symbols it maps to
     #
     # Input
     #  xs: list of support inputs (list of list of symbols)
@@ -576,7 +589,7 @@ def flip_RHS(RHS_list):
     #  arguments on the output side, e.g., [u1] dax [u2] -> [u1] [u2] [u1]
     # 
     # Input
-    #   RHS_list : list of right-hand-size variables like '[u2] [u2] [x1]'
+    #   RHS_list : list of right-hand-side variables like '[u2] [u2] [x1]'
     # Output
     #   same list, but with roles of variables switched
     list_var = sorted(set(RHS_list))
@@ -590,10 +603,10 @@ def use_flipped_grammar(xq_item,grammar_str,maxlen,input_symbols=input_symbols_l
     #  swapping the arguments when applied
     #
     # Input
-    #  xq_item : Single query command (list of symbols)
+    #  xq_item : Single query command (list of token strings)
     #  grammar_str : (string) gold grammar for episode
     #  maxlen : maximum output length
-    #  input_symobls : different possible input tokens(for sake of constructing the grammar)
+    #  input_symbols : different possible input tokens(for sake of constructing the grammar)
     #
     # Output
     #  yq_item : Single query output (list of symbols)
@@ -617,13 +630,14 @@ def use_flipped_grammar(xq_item,grammar_str,maxlen,input_symbols=input_symbols_l
     return yq_item
 
 class DataHumanFewShot(Dataset):
+    # For evaluating predictions on human few-shot learning behavior
     
     def __init__(self, mode, inc_support_in_query=False, do_remap=True, data_mult=1, mydir='data_human/few_shot'):
         # Input
         #   mode : 'gold' for ground-truth responses for each command
         #          'behavior' for actual human responses
         #  inc_support_in_query : (default=False) include all support examples as queries? If True, it messes up the log-likelihood calculations.
-        #  do_remap : [default=True] Randomly remap the input and output symbols to standard pseudowords and colors? 
+        #  do_remap : [default=True] Randomly remap the input and output symbols to standard pseudowords and colors 
         #  data_mult : [default=1] replicate the queries this many times (useful if we want multiple samples from models)
         assert mode in ['gold','behavior']
         self.placeholder_length = 100 # placeholder number of episodes (if 'gold' mode)
@@ -653,16 +667,12 @@ class DataHumanFewShot(Dataset):
             return len(self.list_items)
 
     def __getitem__(self, idx):
-        if self.is_gold:
+        if self.is_gold: # gold output strings
             S = readfile(self.fn_gold)
         else: # behavioral data
             S = readfile(self.list_items[idx])
         if self.randomize_order:
-            if not DEBUG:
-                S['xs'], S['ys'] = utils.shuffle(S['xs'], S['ys'])
-            else:
-                print('*warning* using legacy randomization code')
-                S = legacy_perm_randomize_order(S)
+            S['xs'], S['ys'] = utils.shuffle(S['xs'], S['ys'])
         S['aux'] = {}
         if self.do_remap: S = assign_random_map(S, self.input_symbols, self.output_symbols)
         if self.inc_support_in_query:
@@ -682,10 +692,13 @@ class DataHumanFewShot(Dataset):
         return S
 
 class DataHumanProbe(Dataset):
+    # Predicting human responses on "additional inductive bias" probe experiments
+
     def __init__(self, mode, data_mult=1, inc_pool=False, mydir='data_human/data_behavior_probes'):
         # Input
+        #  mode : train vs. val
         #  data_mult : copy the examples this many times
-        #  inc_pool : if True, list of the pool options in string
+        #  inc_pool : if True, use string to list pool of possible options
         assert mode in ['train','val']
         self.mode = mode
         self.placeholder_length = 100000 # placeholder number of episodes (if 'train' mode)
@@ -717,11 +730,7 @@ class DataHumanProbe(Dataset):
             S = readfile(fn) 
         output_pool = S['grammar_str'].lstrip('allowed outputs:\n').split()
         if self.randomize_order:
-            if not DEBUG:
-                S['xs'], S['ys'] = utils.shuffle(S['xs'], S['ys'])
-            else:
-                print('*warning* using legacy randomization code')
-                S = legacy_perm_randomize_order(S)
+            S['xs'], S['ys'] = utils.shuffle(S['xs'], S['ys'])
         if self.do_remap: S = assign_random_map(S, self.input_symbols, self.output_symbols, output_pool)
         if self.inc_support_in_query:
             S['xq'] = S['xs'] + S['xq']
@@ -743,7 +752,7 @@ class DataHumanProbe(Dataset):
         return S
 
 class DataFewShotVanilla(Dataset):
-    # Train vanilla seq2seq model on few-shot learning task
+    # Train vanilla seq2seq model directly on few-shot learning task
 
     def __init__(self, mode, mydir='data_human/few_shot'):
         # Input
@@ -808,22 +817,6 @@ class DataHumanVanilla(DataHumanFewShot):
         S['aux'] = {'unmap_output': lambda x:x, 'unmap_input': lambda x:x}
         return bundle_biml_episode(S['xs'],S['ys'],S['xq'],S['yq'],'',aux=S['aux'])
 
-def legacy_perm_randomize_order(S):
-    # Permute order of support and query examples.
-    if len(S['xs']) > 0:
-        s_zip = list(zip(S['xs'],S['ys']))
-        random.shuffle(s_zip)
-        S['xs'], S['ys'] = zip(*s_zip)
-        S['xs'] = list(S['xs'])
-        S['ys'] = list(S['ys'])
-    if len(S['xq']) > 0:
-        q_zip = list(zip(S['xq'],S['yq']))
-        random.shuffle(q_zip)
-        S['xq'], S['yq'] = zip(*q_zip)
-        S['xq'] = list(S['xq'])
-        S['yq'] = list(S['syq'])
-    return S        
-
 class DataHumanOpenEnded(Dataset):
     # Human data for open-ended task with arbitrary query/support split for each participant
     
@@ -859,11 +852,7 @@ class DataHumanOpenEnded(Dataset):
             S = readfile(self.list_items[idx]) ## if we truly want to iterate over files
         assert(len(S['xs'])==0) # in the text files, all items should be listed as queries
         if self.randomize_order:
-            if not DEBUG:
-                S['xq'], S['yq'] = utils.shuffle(S['xq'], S['yq'])
-            else:
-                print('*warning* using legacy randomization code')
-                S = legacy_perm_randomize_order(S)
+            S['xq'], S['yq'] = utils.shuffle(S['xq'], S['yq'])
         S = assign_random_map(S, self.input_symbols, self.output_symbols)
         S = self.__random_query_split_uniform(S)
         if self.inc_support_in_query:
@@ -964,19 +953,16 @@ class DataFreeformOpenEnded(Dataset):
         S = readfile(self.fn)
         assert(len(S['xs'])==0) # in the text files, all items should be listed as queries
         if self.randomize_order:
-            if not DEBUG:                
-                S['xq'], S['yq'] = utils.shuffle(S['xq'], S['yq'])
-            else:
-                print('*warning* using legacy randomization code')
-                random.choice(['debug']) # called to pick file name
-                S = legacy_perm_randomize_order(S)
+            S['xq'], S['yq'] = utils.shuffle(S['xq'], S['yq'])
         S = assign_random_map(S, self.input_symbols, self.output_symbols)
         assert(len(S['xs'])==0 and len(S['ys'])==0)
         return bundle_biml_episode(S['xs'],S['ys'],S['xq'],S['yq'],'',aux=S['aux'])
 
 class MixDataset(Dataset):
+    # Dataset that chooses episodes from a mixture of other datasets
 
     def __init__(self, list_datasets):
+        # list_datasets: list of Dataset objects
         self.list_datasets = list_datasets
         self.mylens = np.array([len(D) for D in self.list_datasets])
         self.cumsum = np.cumsum(self.mylens)
@@ -997,14 +983,18 @@ class MixDataset(Dataset):
         return D.__getitem__(new_idx)
 
     def idx_to_D(self, idx):
-        # which dataset given the current index?
+        # which dataset given the current index in epoch?
+        #
+        # output
+        #  j: index of the right dataset
+        #  new_idx: index into that dataset
         assert(idx < len(self)), "index must be less than the overall length"
         lt = idx < self.cumsum
         j = np.min(np.nonzero(lt))
         new_idx = idx
         if j > 0:
             new_idx = new_idx - self.cumsum[j-1]
-        return j, new_idx # j is current dataset, new_idx is index into that dataset
+        return j, new_idx # j is index of the right dataset, new_idx is index into that dataset
 
 def assign_random_map(S, new_input_symbols, new_output_symbols, output_pool=[]):
     # Each input and output symbol in the episode file are re-assigned based on 
@@ -1057,251 +1047,18 @@ def assign_random_map(S, new_input_symbols, new_output_symbols, output_pool=[]):
     S['xq'] = list(map(map_input,S['xq']))
     S['ys'] = list(map(map_output,S['ys']))
     S['yq'] = list(map(map_output,S['yq']))
-    if DEBUG:
-        S['aux']['list_input_mapping'] = list(zip(unique_in_symb,lang_in_symb_trunc))
-        S['aux']['list_output_mapping'] = list(zip(unique_out_symb,lang_out_symb_trunc))
-        S['aux']['S_raw'] = S_raw
-        # debug_assign_random_map(S)
     return S
-
-def debug_assign_random_map(sample):    
-    # Output structure from assign_random_map should pass this test, which
-    #  reconstructs original text from remapped text
-    aux = sample['aux']
-    sample_raw = aux['S_raw']
-    ui = lambda x: list(map(aux['unmap_input'], x))
-    uo = lambda y : list(map(aux['unmap_output'], y))
-    assert(ui(sample['xs'])==sample_raw['xs'])
-    assert(ui(sample['xq'])==sample_raw['xq'])
-    assert(uo(sample['ys'])==sample_raw['ys'])
-    assert(uo(sample['yq'])==sample_raw['yq'])
-    print("* DEBUG PASSED * debug_assign_random_map")
-    print('ORIGINAL TEXT')
-    print('*Support*')
-    display_input_output(sample_raw['xs'],sample_raw['ys'],sample_raw['ys'])
-    print("")
-    print('*Query*')
-    display_input_output(sample_raw['xq'],sample_raw['yq'],sample_raw['yq'])
-    print("")
-    print('RECONSTRUCT ORIGINAL TEXT')
-    print('*Support*')
-    display_input_output(ui(sample['xs']),uo(sample['ys']),uo(sample['ys']))
-    print("")
-    print('*Query*')
-    display_input_output(ui(sample['xq']),uo(sample['yq']),uo(sample['yq']))
-    print(aux['list_input_mapping'])
-    print(aux['list_output_mapping'])
-
-def debug_heuristic_sampling(sample, D_val):
-    prims = get_prims(sample['xs'],sample['ys'])
-    prims_target = {'1':'1','2':'2','3':'3','DAX':'DAX'}
-    assert(prims==prims_target)
-    print("* DEBUG PASSED * get_prims")
-
-    print('Examples of response noise')
-    nq = len(sample['xq'])
-    p_noise = 0.25
-    for idx in range(nq):
-        myresponse = sample['yq'][idx]
-        mynoise1 = add_response_noise(myresponse, p_noise, D_val.langs)
-        mynoise2 = add_response_noise(myresponse, p_noise, D_val.langs)
-        mynoise3 = add_response_noise(myresponse, p_noise, D_val.langs)
-        print('gold:',' '.join(myresponse))
-        print(' response1:',' '.join(mynoise1))
-        print(' response2:',' '.join(mynoise2))
-        print(' response3:',' '.join(mynoise3))
-        print("")
-
-    print('Compute examples of one2one heuristic')
-    nq = len(sample['xq'])
-    for idx in range(nq):
-        mycommand = sample['xq'][idx]
-        myout1 = use_one2one_heuristic(mycommand,prims,D_val.langs)
-        myout2 = use_one2one_heuristic(mycommand,prims,D_val.langs)
-        myout3 = use_one2one_heuristic(mycommand,prims,D_val.langs)
-        target = sample['yq'][idx]
-        print(' command   :',' '.join(mycommand))
-        print(' heuristic1:',' '.join(myout1))
-        print(' heuristic2:',' '.join(myout2))
-        print(' heuristic3:',' '.join(myout3))
-        print("")
-
-    print('Compute examples of flipped rule heuristic')
-    grammar_str = sample['aux']['grammar_str']
-    nq = len(sample['xq'])
-    for idx in range(nq):
-        mycommand = sample['xq'][idx]
-        myout1 = use_flipped_grammar(mycommand,grammar_str,8,input_symbols=D_val.input_symbols)
-        myout2 = use_flipped_grammar(mycommand,grammar_str,8,input_symbols=D_val.input_symbols)
-        myout3 = use_flipped_grammar(mycommand,grammar_str,8,input_symbols=D_val.input_symbols)
-        target = sample['yq'][idx]
-        print(' command   :',' '.join(mycommand))
-        print(' target   :',' '.join(target))
-        print(' heuristic1:',' '.join(myout1))
-        print(' heuristic2:',' '.join(myout2))
-        print(' heuristic3:',' '.join(myout3))
-        print("")
-
-def nearest_neighbor_grammar(g_query,list_g,k=5):
-    # Find the closest grammars to g_query
-    #   based on edit distance treating each rule as a primitive
-    # 
-    #  Input
-    #   g_query : string desc. (hash) of grammar that we want to query
-    #   list_g : [n list] string descriptions (hashes) of grammars to compare with
-    #   k: find the k closest grammars
-    #
-    from distance import levenshtein
-    assert(isinstance(g_query,str) and isinstance(list_g[0],str))
-    n = len(list_g)
-    g_query_ready = make_hashable(g_query).split('\n')
-    list_g_ready = [make_hashable(g).split('\n') for g in list_g]
-    
-    # compute distance to each possible grammar
-    dist = np.zeros(n)
-    print('Computing pairwise distances..')
-    for idx,g_ready in enumerate(list_g_ready):
-        if (idx % 1000==0): print('   grammar ' + str(idx))
-        dist[idx] = levenshtein(g_query_ready,g_ready)
-    list_g_sorted = [g for _, g in sorted(zip(dist, list_g), key=lambda pair: pair[0])]
-
-    print("")
-    print('Query:')
-    print('-------')
-    print(g_query)
-    print("")
-    print('Matches:')
-    print('-------')
-    for i in range(k):
-        print(levenshtein(g_query_ready,list_g_sorted[i].split('\n')))      
-        print(list_g_sorted[i])
-        print("")
-
-def debug_verify_val_grammars(grammars_val,grammars_train):
-    # Very if any of the items in grammars_val are identical to grammars_train
-    # 
-    #  Input
-    #   grammars_val : list of validation grammars (as indentifiers)
-    #   grammars_train : same, but with training grammars
-    #  
-    assert(grammars_val[0] == make_hashable(grammars_val[0]))
-    assert(grammars_train[0] == make_hashable(grammars_train[0]))
-    count = 0
-    print('Checking for duplicate grammar between val and train set..')
-    for idx,g_v in enumerate(grammars_val):
-        if idx % 10 == 0: print(' checking val grammar ' + str(idx))
-        duplicate = g_v in grammars_train
-        if duplicate: print('    duplicate val grammar, number ' + str(idx))
-        count += int(duplicate)
-    print('Total number of duplicates: ' + str(count))
-
-def get_all_grammars(D,is_sorted=True):
-    #   Returns list of all grammars in dataset D (string form)
-    #     if is_sorted, sort the rules by alphabetical order
-    if is_sorted:
-        return [sample['identifier'] for sample in D]
-    else:
-        return [sample['aux']['grammar_str'] for sample in D]
-
-def debug_check_grammar_consistent(D):
-    # 
-    input_lang = D.langs['input']
-    mean_acc = []
-    for sample in D:
-        G_str = sample['aux']['grammar_str'] # non-sorted format, should have \n separators
-        G = str_to_grammar(G_str, input_lang.symbols)
-        acc_query,yq_predict,_ = score_grammar(G,sample,'query')
-        assert(yq_predict==sample['yq'])
-        mean_acc.append(acc_query)
-    print('  Mean accuracy for queries (should be 100%): ' + str(np.mean(mean_acc)))
-
-def debug_check_no_miniscan(D):
-    count_match = 0
-    for idx,sample in enumerate(D):
-        if idx % 1000==0: print('  grammar',idx)
-        G_str = sample['aux']['grammar_str'] # non-sorted format, with \n separators
-        if equiv_to_miniscan(G_str):
-            print('** match for idx',idx,'**')
-            print('---Original grammar---')
-            print(G_str)
-            count_match += 1
-    print('Number of matches:',count_match,'of total',len(D))
-
-def equiv_to_miniscan(G_source_str):
-    # Is the grammar G_source_Str equivalent to the MiniScan grammar?
-    #
-    # Input
-    #  G_source_str : grammar as string (with \n separators). candidate grammar to compare
-    # Output
-    #  true/false : is it equivalent to MiniSCAN grammar?
-    assert(isinstance(G_source_str, str) and '\n' in G_source_str)
-    G_source_rules = G_source_str.split('\n') # list of rules
-    my_rules = [r.strip() for r in G_source_rules[4:7]]
-    my_rules_possible_thrice = [change_rule_name(r,'thrice') for r in my_rules]
-    my_rules_possible_surround = [change_rule_name(r,'surround') for r in my_rules]
-    my_rules_possible_after = [change_rule_name(r,'after') for r in my_rules]
-    match = 'u1 thrice -> [u1] [u1] [u1]' in my_rules_possible_thrice
-    match = match and 'u1 surround u2 -> [u1] [u2] [u1]' in my_rules_possible_surround
-    match = match and 'x1 after x2 -> [x2] [x1]' in my_rules_possible_after
-    return match
-
-def change_rule_name(rule_str,new_name):
-    # Input
-    #  rule_str : (str) rule in string format
-    #  new_name : (str) rename the function to this string
-    s = rule_str.split()
-    s[1] = new_name
-    return ' '.join(s)       
-
-def debug_algebraic_set():
-    D_train, D_val = get_dataset('algebraic')
-    # D_train, D_val = get_dataset('algebraic_loose')
-
-    print('Train set : checking to ensure grammars are consistent with examples...')
-    debug_check_grammar_consistent(D_train)
-    print('Val set : checking to ensure grammars are consistent with examples...')
-    debug_check_grammar_consistent(D_val)
-
-    debug_verify_val_grammars(get_all_grammars(D_val),get_all_grammars(D_train))
-    
-    print('Val set : checking if it contains episodes with a grammar handles MiniSCAN commands correctly, with right permutation of tokens')
-    debug_check_no_miniscan(D_val)
-    print('Train set : checking if it contains episodes with a grammar handles MiniSCAN commands correctly, with right permutation of tokens')
-    debug_check_no_miniscan(D_train)
 
 if __name__ == "__main__":
     
-    # seed_all()
-
-    # # Test code
-    # debug_algebraic_set()
-
-    # query = 'blicket -> GREEN \n tufa -> BLUE \n zup -> YELLOW \n wif -> RED \n x1 fep x2 -> [x2] [x1] \n u1 lug -> [u1] [u1] [u1] \n u1 kiki u2 -> [u1] [u2] [u1] \n u1 x1 -> [u1] [x1]'
-    # grammars_train = get_all_grammars(D_train)
-    # nearest_neighbor_grammar(query,grammars_train)
-    # # grammars_val = get_all_grammars(D_val)
-    # # debug_verify_val_grammars(grammars_val,grammars_train)
-
-    D_train, D_val = get_dataset('probe_human_w_pool')
-
+    # Example episode for meta-training with full BIML model
+    D_train, D_val = get_dataset('algebraic+biases')
     sample = D_train[0]
-    print(sample['aux']['output_pool'])
     print("")
-    print('*Support*')
+    print('Example episode')
+    print("")
+    print('*Study examples*')
     display_input_output(sample['xs'],sample['ys'],sample['ys'])
     print("")
-    print('*Query*')
+    print('*Query examples*') # includes 20 study examples and 20 nove queries
     display_input_output(sample['xq'],sample['yq'],sample['yq'])
-    print('*Query+Context*')
-    display_input_output(sample['xq_context'],sample['yq'],sample['yq'])
-
-    sample = D_train[1]
-    print(sample['aux']['output_pool'])
-    print("")
-    print('*Support*')
-    display_input_output(sample['xs'],sample['ys'],sample['ys'])
-    print("")
-    print('*Query*')
-    display_input_output(sample['xq'],sample['yq'],sample['yq'])
-    print('*Query+Context*')
-    display_input_output(sample['xq_context'],sample['yq'],sample['yq'])

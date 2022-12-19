@@ -13,10 +13,15 @@ import datasets as dat
 from train_lib import seed_all, extract, display_input_output, assert_consist_langs
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+## Evaluate a pre-trained model
+
 def evaluate_ll(val_dataloader, net, langs, loss_fn=[], p_lapse=0.0, verbose=False):
     # Evaluate the total (sum) log-likelihood across the entire validation set
     # 
     # Input
+    #   val_dataloader : 
+    #   net : BIML model
+    #   langs : dict of dat.Lang classes
     #   p_lapse : (default 0.) combine decoder outputs (prob 1-p_lapse) as mixture with uniform distribution (prob p_lapse)
     net.eval()
     total_N = 0
@@ -31,8 +36,13 @@ def evaluate_ll(val_dataloader, net, langs, loss_fn=[], p_lapse=0.0, verbose=Fal
 
 def evaluate_acc(val_dataloader, net, langs, max_length, eval_type='max', verbose=False):
     # Evaluate accuracy (exact match) across entire validation set
+    #
+    # Input
+    #   val_dataloader : 
+    #   net : BIML model
+    #   langs : dict of dat.Lang classes
     #   max_length : maximum length of output sequences
-    #   langs : input and output language class
+    #   langs : dict of dat.Lang classes
     #   eval_type : 'max' for greedy decoding, 'sample' for sample from distribution
     #   out_mask_allow : default=[]; set of emission symbols we want to allow. Default of [] allows all output emissions
     net.eval()
@@ -64,10 +74,12 @@ def evaluate_acc(val_dataloader, net, langs, max_length, eval_type='max', verbos
     return {'samples_pred':samples_pred, 'mean_acc_novel':mean_acc_novel, 'mean_acc_retrieve':mean_acc_retrieve, 'v_novel':v_acc_novel}
 
 def batch_ll(batch, net, loss_fn, langs, p_lapse=0.0):
-    # Evaluate log-likelihood (average over cells, and total) for a given batch
+    # Evaluate log-likelihood (average over cells, and sum total) for a given batch
+    #
+    # Input
     #   batch : from dat.make_biml_batch
     #   loss_fn : loss function
-    #   langs : input and output language class
+    #   langs : dict of dat.Lang classes
     net.eval()
     m = len(batch['yq']) # b*nq
     target_batches = batch['yq_padded'] # b*nq x max_length
@@ -95,6 +107,7 @@ def smooth_decoder_outputs(logits_flat,p_lapse,lapse_symb_include,langs):
     #  logits_flat : (batch*max_len, output_size) # unnomralized log-probabilities
     #  p_lapse : probability of a uniform lapse
     #  lapse_symb_include : list of tokens (strings) that we want to include in the lapse model
+    #  langs : dict of dat.Lang classes
     #
     # Output
     #  log_probs_flat : (batch*max_len, output_size) normalized log-probabilities
@@ -111,9 +124,12 @@ def smooth_decoder_outputs(logits_flat,p_lapse,lapse_symb_include,langs):
 
 def batch_acc(batch, net, langs, max_length, eval_type='max', out_mask_allow=[]):
     # Evaluate exact match accuracy for a given batch
+    #
+    #  Input
     #   batch : from dat.make_biml_batch
+    #   net : BIML model
     #   max_length : maximum length of output sequences
-    #   langs : input and output language class
+    #   langs : dict of dat.Lang classes
     #   eval_type : 'max' for greedy decoding, 'sample' for sample from distribution
     #   out_mask_allow : default=[]; list of emission symbols (strings) we want to allow. Default of [] allows all output emissions
     assert eval_type in ['max','sample']
@@ -130,7 +146,7 @@ def batch_acc(batch, net, langs, max_length, eval_type='max', out_mask_allow=[])
     max_length_target = batch['yq_padded'].shape[1]-1 # length without EOS
     assert max_length >= max_length_target # make sure that the net can generate targets of the proper length
 
-    # make the output mask
+    # make the output mask if certain emissions are restricted
     if use_mask:
         assert dat.EOS_token in out_mask_allow # EOS must be included as an allowed symbol
         additive_out_mask = -torch.inf * torch.ones((m,net.output_size), dtype=torch.float)
@@ -159,17 +175,18 @@ def batch_acc(batch, net, langs, max_length, eval_type='max', out_mask_allow=[])
 
     # Get predictions as strings and see if they are correct
     all_decoder_outputs = all_decoder_outputs.detach()
-    yq_predict = []
+    yq_predict = [] # list of all predicted query outputs as strings
     v_acc = np.zeros(m)
     for q in range(m):
         myseq = emission_lang.tensor_to_symbols(all_decoder_outputs[q,:].view(-1))
         yq_predict.append(myseq)
-        v_acc[q] = yq_predict[q] == batch['yq'][q]
-    in_support = np.array(batch['in_support'])
+        v_acc[q] = yq_predict[q] == batch['yq'][q] # for each query, did model get it right?
+    in_support = np.array(batch['in_support']) # which queries are also support items
     out = {'yq_predict':yq_predict, 'v_acc':v_acc, 'in_support':in_support}
     return out
 
 def viz_train_dashboard(train_tracker):
+    # Show loss curves
     import matplotlib.pyplot as plt
     if not train_tracker:
         print('No training stats to plot')
@@ -179,7 +196,6 @@ def viz_train_dashboard(train_tracker):
     plt.subplot(2, 2, 1)
     plt.plot(fv('step'),fv('avg_train_loss'),'b',label='train')
     if 'val_loss' in train_tracker[0] : plt.plot(fv('step'),fv('val_loss'),'r',label='val')
-    # plt.ylim((0,1.5))
     plt.xlabel('step')
     plt.legend()
     plt.title('Loss')
@@ -190,8 +206,10 @@ def viz_train_dashboard(train_tracker):
     plt.show()
 
 def display_console_pred(samples_pred):
-    # Show model predictions in console
-    #  samples_pred : list of dicts from evaluate_acc, which has predictions for each episode
+    # Print model predictions
+    #
+    # Input
+    #  samples_pred : list of dicts from evaluate_acc, which has predicted query outputs for each episode
     for idx,sample in enumerate(samples_pred):
         print('Evaluation episode ' + str(idx))
         in_support = sample['in_support']
@@ -207,8 +225,10 @@ def display_console_pred(samples_pred):
         display_input_output(extract(is_novel,sample['xq']),extract(is_novel,sample['yq_predict']),extract(is_novel,sample['yq']))
 
 def display_console_unmap(samples_pred):
-    # Show model predictions in console.
-    #  There must also be a remapping back to canonical text format.
+    # Print model predictions after remapping
+    #  There must also be a remapping from current tokens back to canonical tokens/
+    #
+    # Input
     #  samples_pred : list of dicts from evaluate_acc, which has predictions for each episode
     for idx,sample in enumerate(samples_pred):
         assert('unmap_input' in sample['aux']), "there must be mapping back to canonical text form"
@@ -228,7 +248,7 @@ def display_console_unmap(samples_pred):
         print('  retrieval items;',round(sample['acc_retrieve'],3),'% correct')
         display_input_output(extract(in_support,ui(sample['xq'])), extract(in_support,uo(sample['yq_predict'])), extract(in_support,uo(sample['yq'])))
         print('  generalization items;',round(sample['acc_novel'],3),'% correct')
-        display_input_output(extract(is_novel,ui(sample['xq'])),extract(is_novel,uo(sample['yq_predict'])),extract(is_novel,uo(sample['yq'])))        
+        display_input_output(extract(is_novel,ui(sample['xq'])),extract(is_novel,uo(sample['yq_predict'])),extract(is_novel,uo(sample['yq'])))
 
 def display_html_unmap(samples_pred, fid, freq='percent', include_support=False):
     #  Show model predictions when sampling. 
@@ -284,12 +304,15 @@ def display_html_unmap(samples_pred, fid, freq='percent', include_support=False)
 
 def evaluate_ll_multi_rep(nrep, val_dataloader, net, langs, p_lapse=0.0):
     # Across multiple random runs, evaluate the total (sum) log-likelihood across the validation set.
-    #   Multiple runs may be needed when certain things are randomized, like the mapping between datafiles
+    #   Multiple runs may be needed when certain things are randomized, like the mapping between original data files
     #   and input/output tokens.
     #
     #  Input
     #   nrep : number of replications
     #    for rest of input arguments, see def evaluate_ll
+    #   net : BIML model
+    #   langs : dict of dat.Lang classes
+    #
     # Output
     #   ave_ll_by_cell : return average log-likelihood for each cell
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=langs['output'].PAD_idx)
@@ -334,11 +357,13 @@ def fit_p_lapse(nrep, val_dataloader, net, langs, greedy_stop=True):
 def evaluate_iterative(val_dataloader, net, langs, max_length, eval_type='max', out_mask_allow=[], verbose=False):
     # Sample from model iteratively: 
     #   1) Generate output for the first query
-    #   2) Add command to support set using self-generated output as target
+    #   2) Add this query as a study example, using self-generated output as the target
     #   3) If there is another query, go back to step 1.
     #  
     # Input
-    #   langs : input and output language class
+    #   val_dataloader : PyTorch dataloader
+    #   net : BIML model
+    #   langs : dict of dat.Lang classes
     #   max_length : maximum length of the output sequences
     #   eval_type : 'max' for greedy decoding, 'sample' for sample from distribution
     #   out_mask_allow : default=[]; set of emission symbols we want to allow. Default of [] allows all output emissions
@@ -359,8 +384,7 @@ def evaluate_iterative(val_dataloader, net, langs, max_length, eval_type='max', 
     return {'samples_pred' : samples_pred}
 
 def batch_iterative(batch, net, langs, max_length, eval_type='max', out_mask_allow=[], verbose=False):
-    # Evaluate each episode iteratively by making prediction for the first query,
-    #  adding it along with its prediction to the support set, etc. and repeating until there are no more queries
+    # Helper function for evaluate_iterative. Processes a whole batch in iterative manner
     batch_next = batch
     flag_batch_changed = True
     ii=0
@@ -433,8 +457,8 @@ if __name__ == "__main__":
         parser.add_argument('--max', default=False, action='store_true', help='Find best outputs for val commands (greedy decoding)')
         parser.add_argument('--sample', default=False, action='store_true', help='Sample outputs for val commands')
         parser.add_argument('--sample_html', default=False, action='store_true', help='Sample outputs for val commands in html format (using unmap to canonical text)')
-        parser.add_argument('--sample_iterative', default=False, action='store_true', help='Sample outputs for val commands iteratively')
-        parser.add_argument('--fit_lapse', default=False, action='store_true', help='Fit the lapse rate')
+        parser.add_argument('--sample_iterative', default=False, action='store_true', help='Sample outputs for val commands iteratively. Output in html format')
+        parser.add_argument('--fit_lapse', default=False, action='store_true', help='Fit the best lapse rate according to log-likelihood on validation')
         parser.add_argument('--ll_nrep', type=int, default=1, help='Evaluate each episode this many times when computing log-likelihood (needed for stochastic remappings)')
         parser.add_argument('--ll_p_lapse', type=float, default=0., help='Lapse rate when evaluating log-likelihoods')
         parser.add_argument('--verbose', default=False, action='store_true', help='Inspect outputs in more detail')
@@ -467,7 +491,7 @@ if __name__ == "__main__":
         if not episode_type: episode_type = checkpoint['episode_type']
         if batch_size<=0: batch_size = checkpoint['batch_size']
         nets_state_dict = checkpoint['nets_state_dict']
-        if list(nets_state_dict.keys())==['net']: nets_state_dict = nets_state_dict['net'] # for compatability with legacy code
+        if list(nets_state_dict.keys())==['net']: nets_state_dict = nets_state_dict['net'] # for compatibility with legacy code
         input_size = checkpoint['langs']['input'].n_symbols
         output_size = checkpoint['langs']['output'].n_symbols
         emb_size = checkpoint['emb_size']
@@ -496,7 +520,7 @@ if __name__ == "__main__":
         val_dataloader = DataLoader(D_val,batch_size=batch_size,
                                     collate_fn=lambda x:dat.make_biml_batch(x,langs),shuffle=False)
 
-        # For backward compatability if previous model shared padding token with EOS
+        # For backward compatibility with legacy code that used same EOS and PAD tokens
         add_pad = dat.PAD_token not in checkpoint['langs']['input'].symbol2index
         
         # Load model parameters         
@@ -505,7 +529,6 @@ if __name__ == "__main__":
             nlayers_encoder=nlayers_encoder, nlayers_decoder=nlayers_decoder, 
             dropout_p=dropout_p, activation=myact, ff_mult=ff_mult)        
         net.load_state_dict(nets_state_dict)
-        if add_pad: net.expand_embeddings() # needed to handle padding
         net = net.to(device=DEVICE)
         describe_model(net)
     
