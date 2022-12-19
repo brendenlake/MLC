@@ -1,0 +1,31 @@
+body {
+    padding:0px;
+    margin: 0px;
+    background-color: white;
+    color: black;
+    font-weight: 300; 
+    font-size: 13pt;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+}
+strong {
+  font-weight: 600;         
+}
+ul {
+    list-style-type: none;
+    margin:0;
+    padding:5px;
+    overflow:hidden;
+    text-align:left;
+}
+li {
+    float:left;
+    font-size:60px;
+}
+li.data_li {
+    font-size:30px;
+}
+li span {
+    display:block;
+    text-align:center;
+    text-decoration:none;
+}

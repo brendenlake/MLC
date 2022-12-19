@@ -564,19 +564,20 @@ if __name__ == "__main__":
             print(' Acc Novel (val):',round(np.mean(E['v_novel']),4),
                     'SD=',round(np.std(E['v_novel']),4),'N=',len(E['v_novel']))
         if do_sample_html:
+            assert(episode_type in ['few_shot_human_mult10'])
             seed_all()
             print('Sampling from model to produce HTML file...')
             E = evaluate_acc(val_dataloader, net, langs, max_length_eval, eval_type='sample', verbose=False)            
             episode_type_tag = episode_type
             if 'probe_human' in episode_type: episode_type_tag = 'probe_human'
-            with open('analysis/'+episode_type_tag+'/'+model_tag+'.txt','w') as fid_out:
+            with open('html_output/'+episode_type_tag+'/'+model_tag+'.txt','w') as fid_out:
                 prev = sys.stdout
                 sys.stdout = fid_out # re-rout outputs to file
                 display_console_unmap(E['samples_pred'])
                 sys.stdout = prev
-            with open('analysis/'+episode_type_tag+'/template.html','r') as fid_in:
+            with open('html_output/'+episode_type_tag+'/template.html','r') as fid_in:
                 mylines = fid_in.readlines()
-            with open('analysis/'+episode_type_tag+'/'+model_tag+'.html','w') as fid_out:
+            with open('html_output/'+episode_type_tag+'/'+model_tag+'.html','w') as fid_out:
                 for l in mylines:
                     fid_out.write(l)
                     if l.strip() == '// PLACEHOLDER':
@@ -585,12 +586,13 @@ if __name__ == "__main__":
                             display_html_unmap(E['samples_pred'], fid_out, freq='percent', include_support=True)
                         else:    
                             display_html_unmap(E['samples_pred'], fid_out, freq='percent')
-            print('Done writing to files: analysis/'+model_tag+'.html and .txt')                        
+            print('Done writing to files: html_output/'+episode_type_tag+'/'+model_tag+'.html and .txt')                        
         if do_sample_iterative:
+            assert(episode_type in ['open_end_freeform'])
             seed_all()
             print('Iteratively evaluate queries by adding them, one-by-one, to the support set using self-generated targets.')
             E = evaluate_iterative(val_dataloader, net, langs, max_length_eval, eval_type='sample', verbose=verbose)
-            with open('analysis/'+episode_type+'/'+model_tag+'.txt','w') as fid_out:
+            with open('html_output/'+episode_type+'/'+model_tag+'.txt','w') as fid_out:
                 prev = sys.stdout
                 sys.stdout = fid_out # re-rout outputs to file
                 display_console_pred(E['samples_pred'])

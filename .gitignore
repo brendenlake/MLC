@@ -2,3 +2,7 @@ data_algebraic
 out_models
 __pycache__
 *.sublime-*
+html_output/few_shot_human_mult10/human_few_shot_behavior.html
+html_output/few_shot_human_mult10/few_shot_human_mult10_*
+html_output/open_end_freeform/open_end_freeform_*
+html_output/open_end_freeform/human_open_end_freeform.html
