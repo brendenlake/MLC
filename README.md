@@ -7,14 +7,14 @@ This code accompanies the following submitted paper.
 
 You can email brenden AT nyu.edu if you would like a copy.
 
-### Credits
+## Credits
 This repo borrows from the excellent [PyTorch seq2seq tutorial](https://pytorch.org/tutorials/beginner/translation_transformer.html).
 
-### Requirements
+## Requirements
 Python 3 with the following packages:
 torch (PyTorch), sklearn (scikit-learn), numpy, matplotlib
 
-### Downloading data and pre-trained models
+## Downloading data and pre-trained models
 
 **Meta-training data**  
 To get the episodes used for meta-training, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/data_algebraic.zip) with the 100K meta-training episodes. Please extract `data_algebraic.zip` such that `data_algebraic`is a sub-directory of the main repo.
@@ -22,16 +22,16 @@ To get the episodes used for meta-training, you should download the following [z
 **Pre-trained models**  
 To get the top pre-trained models, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-BIML-*.pt`.
 
-### Evaluating models
+## Evaluating models
 There are many different ways to evaluate a model after training. Here are a few examples.
 
-**Generating algebraic outputs on few-shot learning task**  
+### Generating algebraic outputs on few-shot learning task 
 Here we find the best response from the pre-trained BIML model using greedy decoding:
 ```python
 python eval.py  --max --episode_type few_shot_gold --fn_out_model net-BIML-top.pt --verbose
 ```
 
-**Evaluating human responses on few-shot learning task (using log-likelihood)**  
+### Evaluating human responses on few-shot learning task (using log-likelihood)
 Here we evaluate the log-likelihood of the human data:
 ```python
 python eval.py  --ll --ll_nrep 100 --episode_type few_shot_human --ll_p_lapse 0.03 --fn_out_model net-BIML-top.pt
@@ -47,7 +47,7 @@ To evaluate the log-likelihood of all models and to reproduce Figure 4B in the m
 | net-BIML-top.pt           | 0.03         |few_shot_human  |
 
 
-**Sampling model responses for the few-shot learning task**  
+###  Sampling model responses for the few-shot learning task
 The models can be asked to mimic human responses on few-shot learning. To do so, the models sample from their distribution of possible outputs. A full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for BIML (or other models), you can type the following to generate a HTML page.
 ```python
 python eval.py --episode_type few_shot_human_mult10 --sample_html --fn_out_model net-BIML-top.pt
@@ -83,7 +83,7 @@ Correlation for item accuracies: r= 0.788 ; p= 0.007
 Generating HTML file: human_few_shot_behavior.html
 ```
 
-**Sampling model responses for the open-ended task**  
+### Sampling model responses for the open-ended task
 The models can be asked to mimic human responses on the open-ended task. Again, a full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for BIML, you can type the following two commands to generate a HTML page.
 ```python
 python eval.py --episode_type open_end_freeform --sample_iterative --fn_out_model net-BIML-open-ended-top.pt
@@ -94,7 +94,7 @@ cd html_output/open_end_freeform
 python analysis_freeform.py
 ```
 This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences. Here is a snippet of the HTML and the text output.  
-<img src="imgs/open_ended_html.pn" alt="open-ended task" width="100"/>
+<img src="imgs/open_ended_html.png" alt="open-ended task" width="100"/>
 ```
 Human:
    Processing 29 human participants.
@@ -142,7 +142,7 @@ optional arguments:
   --verbose             Inspect outputs in more detail
 ```
 
-### Episode types
+## Episode types
 Please see `datasets.py` for the full set of options. Here are a few key episode types that can be set via `--episode_type`:
 - `algebraic+biases` : Corresponds to "BIML" in Table 4B and main results
 - `algebraic_noise` : Corresponds to "BIML (algebraic only)" in Table 4B and main results
@@ -152,7 +152,7 @@ Please see `datasets.py` for the full set of options. Here are a few key episode
 - `few_shot_human_mult10` : Same as above for evaluating BIML on predicting human responses, although with each human response included 10x.
 - `open_end_freeform` : For evaluating models productions on open-ended task. Here, the models iteratively fill out responses one-by-one.
 
-### Training models from scratch
+## Training models from scratch
 To train BIML on few-shot learning (as in the BIML model in Fig. 2 and Table 4B), you can run the train command with default arguments:
 ```python
 python train.py --episode_type algebraic+biases --fn_out_model net-BIML.pt
