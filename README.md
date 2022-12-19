@@ -20,7 +20,7 @@ torch (PyTorch), sklearn (scikit-learn), numpy, matplotlib
 To get the episodes used for meta-training, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/data_algebraic.zip) with the 100K meta-training episodes. Please extract `data_algebraic.zip` such that `data_algebraic`is a sub-directory of the main repo.
 
 **Pre-trained models**  
-To get the top pre-trained models, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-*.pt`.
+To get the top pre-trained models, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-BIML-*.pt`.
 
 ### Evaluating models
 There are many different ways to evaluate a model after training. Here are a few examples.
@@ -57,8 +57,8 @@ Then, after ensuring the right file name is at top of script, you can compare th
 cd html_output/few_shot_human_mult10
 python analysis_few_shot.py
 ```
-This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences.
-![few shot learning](imgs/few_shot_html.png)
+This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences.  Here is a snippet of the HTML and the text output.  
+<img src="imgs/few_shot_html.png" alt="few shot learning task" width="100"/>
 ```
 Human responses (item accuracy):
    DAX after 1 : 86.364
@@ -93,8 +93,8 @@ Then, after ensuring the right file name is at top of script, execute:
 cd html_output/open_end_freeform
 python analysis_freeform.py
 ```
-This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences.
-![open-ended task](imgs/open_ended_html.png)
+This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences. Here is a snippet of the HTML and the text output.  
+<img src="imgs/open_ended_html.pn" alt="open-ended task" width="100"/>
 ```
 Human:
    Processing 29 human participants.
