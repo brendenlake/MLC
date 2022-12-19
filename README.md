@@ -58,7 +58,7 @@ cd html_output/few_shot_human_mult10
 python analysis_few_shot.py
 ```
 This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences.  Here is a snippet of the HTML and the text output.  
-<img src="imgs/few_shot_html.png" alt="few shot learning task" width="100"/>
+<img src="imgs/few_shot_html.png" alt="few shot learning task" width="200"/>
 ```
 Human responses (item accuracy):
    DAX after 1 : 86.364
@@ -94,7 +94,7 @@ cd html_output/open_end_freeform
 python analysis_freeform.py
 ```
 This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences. Here is a snippet of the HTML and the text output.  
-<img src="imgs/open_ended_html.png" alt="open-ended task" width="100"/>
+<img src="imgs/open_ended_html.png" alt="open-ended task" width="150"/>
 ```
 Human:
    Processing 29 human participants.
