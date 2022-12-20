@@ -52,12 +52,12 @@ The models can be asked to mimic human responses on few-shot learning. To do so,
 ```python
 python eval.py --episode_type few_shot_human_mult10 --sample_html --fn_out_model net-BIML-top.pt
 ```
-Then, after ensuring the right file name is at top of script, you can compare the human and machine mistakes
+Then, after ensuring the right file name is listed under `__main__` in the script `analysis_few_shot.py`, you can compare the human and machine mistakes
 ```python
 cd html_output/few_shot_human_mult10
 python analysis_few_shot.py
 ```
-This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences.  Here is a snippet of the HTML and the text output.  
+This should reproduce the hosted HTML file and numbers reported in the paper. Small variations may arise through version differences.  Here is a snippet of the HTML and the text output.  
 <img src="imgs/few_shot_html.png" alt="few shot learning task" width="200"/>
 ```
 Human responses (item accuracy):
@@ -88,12 +88,12 @@ The models can be asked to mimic human responses on the open-ended task. Again, 
 ```python
 python eval.py --episode_type open_end_freeform --sample_iterative --fn_out_model net-BIML-open-ended-top.pt
 ```
-Then, after ensuring the right file name is at top of script, execute:
+Then, after ensuring the right file name is listed under `__main__` in the script `analysis_freeform.py`, you can compare the human and machine mistakes
 ```python
 cd html_output/open_end_freeform
 python analysis_freeform.py
 ```
-This should reproduce the hosted HTML file and numbers reported in the paper. Variations are possible due to version differences. Here is a snippet of the HTML and the text output.  
+This should reproduce the hosted HTML file and numbers reported in the paper. Small variations may arise through version differences. Here is a snippet of the HTML and the text output.  
 <img src="imgs/open_ended_html.png" alt="open-ended task" width="150"/>
 ```
 Human:
@@ -144,16 +144,16 @@ optional arguments:
 
 ## Episode types
 Please see `datasets.py` for the full set of options. Here are a few key episode types that can be set via `--episode_type`:
-- `algebraic+biases` : Corresponds to "BIML" in Table 4B and main results
-- `algebraic_noise` : Corresponds to "BIML (algebraic only)" in Table 4B and main results
-- `retrieve` : Correspond to "BIML (copy only)" in Table 4B and main results
-- `few_shot_gold` : For evaluating BIML on the gold algebraic responses for the few-shot learning task. This episode type provides the test set only.
-- `few_shot_human` : For evaluating BIML on predicting human responses for the few-shot learning task. This episode type provides the test set only.
-- `few_shot_human_mult10` : Same as above for evaluating BIML on predicting human responses, although with each human response included 10x.
-- `open_end_freeform` : For evaluating models productions on open-ended task. Here, the models iteratively fill out responses one-by-one.
+- `algebraic+biases` : For meta-training. Corresponds to "BIML" in Table 4B and main results
+- `algebraic_noise` : For meta-training. Corresponds to "BIML (algebraic only)" in Table 4B and main results
+- `retrieve` : For meta-training. Correspond to "BIML (copy only)" in Table 4B and main results
+- `few_shot_gold` : For evaluating BIML on the prescribed algebraic responses for the few-shot learning task. (test only)
+- `few_shot_human` : For evaluating BIML on predicting human responses for the few-shot learning task. (test only)
+- `few_shot_human_mult10` : For evaluating BIML on predicting human responses for the few-shot learning task (human data up-sampled/repeated 10x). (test only)
+- `open_end_freeform` : For generating BIML responses on open-ended task. Here, the models iteratively fill out responses one-by-one. (test only)
 
 ## Training models from scratch
-To train BIML on few-shot learning (as in the BIML model in Fig. 2 and Table 4B), you can run the train command with default arguments:
+To train BIML on few-shot learning (as in the BIML model in Fig. 2 and Table 4B), you can run the `train` command with default arguments:
 ```python
 python train.py --episode_type algebraic+biases --fn_out_model net-BIML.pt
 ```
