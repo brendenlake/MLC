@@ -2,6 +2,8 @@
 
 BIML is a meta-learning approach for guiding neural networks to human-like systematic generalization and inductive biases, through high-level guidance or direct human examples. This code shows how to train and evaluate a sequence-to-sequence (seq2seq) transformer in PyTorch to implement BIML through memory-based meta-learning.
 
+**A [separate repository here](https://github.com/brendenlake/BIML-ML) has code for applying BIML to machine learning benchmarks, including SCAN and COGS.**
+
 This code accompanies the following submitted paper.
 - Lake, B. M. and Baroni, M. (submitted). Human-like systematic generalization through a meta-learning neural network.   
 
