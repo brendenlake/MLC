@@ -13,8 +13,11 @@ You can email brenden AT nyu.edu if you would like a copy.
 This repo borrows from the excellent [PyTorch seq2seq tutorial](https://pytorch.org/tutorials/beginner/translation_transformer.html).
 
 ## Requirements
-Python 3 with the following packages:
+Python 3 with the following packages (install time within minutes):
 torch (PyTorch), sklearn (scikit-learn), numpy, matplotlib
+
+The specific versions used for development:
+Python (3.7.9), PyTorch (1.10.1), sklean (0.24.2), numpy (1.21.5), matplotlib (3.3.2)
 
 ## Downloading data and pre-trained models
 
@@ -25,7 +28,7 @@ To get the episodes used for meta-training, you should download the following [z
 To get the top pre-trained models, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-BIML-*.pt`.
 
 ## Evaluating models
-There are many different ways to evaluate a model after training. Here are a few examples.
+There are many different ways to evaluate a model after training, each of which should take less than a minute on a standard desktop. Here are a few examples.
 
 ### Generating algebraic outputs on few-shot learning task 
 Here we find the best response from the pre-trained BIML model using greedy decoding:
