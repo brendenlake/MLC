@@ -4,7 +4,7 @@ Meta-Learning for Compositionality (MLC) is an optimization procedure that encou
 
 **A [separate repository here](https://github.com/brendenlake/MLC-ML) has code for applying MLC to machine learning benchmarks, including SCAN and COGS.**
 
-**Note: Users can regard the acronym BIML as synonymous with MLC. The model was renamed to MLC after the code was written.**
+**Note: Users can regard the acronym BIML as synonymous with MLC. The approach was renamed to MLC after the code was written.**
 
 This code accompanies the following submitted paper.
 - Lake, B. M. and Baroni, M. (submitted). Human-like systematic generalization through a meta-learning neural network.   
