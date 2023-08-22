@@ -1,8 +1,10 @@
-# Applying Behaviorally-Informed Meta-Learning (BIML) to modeling human behavior
+# Meta-Learning for Compositionality (MLC) for modeling human behavior
 
-BIML is a meta-learning approach for guiding neural networks to human-like systematic generalization and inductive biases, through high-level guidance or direct human examples. This code shows how to train and evaluate a sequence-to-sequence (seq2seq) transformer in PyTorch to implement BIML through memory-based meta-learning.
+Meta-Learning for Compositionality (MLC) is an optimization procedure that encourages systematicity through a series of few-shot compositional tasks. This code shows how to train and evaluate a sequence-to-sequence (seq2seq) transformer in PyTorch to implement MLC for modeling human behavior.
 
-**A [separate repository here](https://github.com/brendenlake/BIML-ML) has code for applying BIML to machine learning benchmarks, including SCAN and COGS.**
+**A [separate repository here](https://github.com/brendenlake/MLC-ML) has code for applying MLC to machine learning benchmarks, including SCAN and COGS.**
+
+**Note: Users can regard the acronym BIML as synonymous with MLC. The model was renamed to MLC after the code was written.**
 
 This code accompanies the following submitted paper.
 - Lake, B. M. and Baroni, M. (submitted). Human-like systematic generalization through a meta-learning neural network.   
@@ -31,7 +33,7 @@ To get the top pre-trained models, you should download the following [zip file](
 There are many different ways to evaluate a model after training, each of which should take less than a minute on a standard desktop. Here are a few examples.
 
 ### Generating algebraic outputs on few-shot learning task 
-Here we find the best response from the pre-trained BIML model using greedy decoding:
+Here we find the best response from the pre-trained MLC model using greedy decoding:
 ```python
 python eval.py  --max --episode_type few_shot_gold --fn_out_model net-BIML-top.pt --verbose
 ```
@@ -41,7 +43,7 @@ Here we evaluate the log-likelihood of the human data:
 ```python
 python eval.py  --ll --ll_nrep 100 --episode_type few_shot_human --ll_p_lapse 0.03 --fn_out_model net-BIML-top.pt
 ```
-To evaluate the log-likelihood of all models and to reproduce Figure 4B in the manuscript, you can run this command for the various models. Please see the table below for how to set the arguments in each case. Note that due to system/version differences, the log-likelihood values may vary in minor ways from the paper.  
+To evaluate the log-likelihood of all models and to reproduce Table 1 in the manuscript, you can run this command for the various models. Please see the table below for how to set the arguments in each case. Note that due to system/version differences, the log-likelihood values may vary in minor ways from the paper.  
 
 | --fn_out_model            | --ll_p_lapse | --episode_type |
 |---------------------------|--------------|----------------|
@@ -53,7 +55,7 @@ To evaluate the log-likelihood of all models and to reproduce Figure 4B in the m
 
 
 ###  Sampling model responses for the few-shot learning task
-The models can be asked to mimic human responses on few-shot learning. To do so, the models sample from their distribution of possible outputs. A full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for BIML (or other models), you can type the following to generate a HTML page.
+The models can be asked to mimic human responses on few-shot learning. To do so, the models sample from their distribution of possible outputs. A full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for MLC (or other models), you can type the following to generate a HTML page.
 ```python
 python eval.py --episode_type few_shot_human_mult10 --sample_html --fn_out_model net-BIML-top.pt
 ```
@@ -89,7 +91,7 @@ Generating HTML file: human_few_shot_behavior.html
 ```
 
 ### Sampling model responses for the open-ended task
-The models can be asked to mimic human responses on the open-ended task. Again, a full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for BIML, you can type the following two commands to generate a HTML page.
+The models can be asked to mimic human responses on the open-ended task. Again, a full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for MLC, you can type the following two commands to generate a HTML page.
 ```python
 python eval.py --episode_type open_end_freeform --sample_iterative --fn_out_model net-BIML-open-ended-top.pt
 ```
@@ -149,16 +151,16 @@ optional arguments:
 
 ## Episode types
 Please see `datasets.py` for the full set of options. Here are a few key episode types that can be set via `--episode_type`:
-- `algebraic+biases` : For meta-training. Corresponds to "BIML" in Table 4B and main results
-- `algebraic_noise` : For meta-training. Corresponds to "BIML (algebraic only)" in Table 4B and main results
-- `retrieve` : For meta-training. Correspond to "BIML (copy only)" in Table 4B and main results
-- `few_shot_gold` : For evaluating BIML on the prescribed algebraic responses for the few-shot learning task. (test only)
-- `few_shot_human` : For evaluating BIML on predicting human responses for the few-shot learning task. (test only)
-- `few_shot_human_mult10` : For evaluating BIML on predicting human responses for the few-shot learning task (human data up-sampled/repeated 10x). (test only)
-- `open_end_freeform` : For generating BIML responses on open-ended task. Here, the models iteratively fill out responses one-by-one. (test only)
+- `algebraic+biases` : For meta-training. Corresponds to "MLC" in Table 1 and main results
+- `algebraic_noise` : For meta-training. Corresponds to "MLC (algebraic only)" in Table 1 and main results
+- `retrieve` : For meta-training. Correspond to "MLC (copy only)" in Table 1 and main results
+- `few_shot_gold` : For evaluating MLC on the prescribed algebraic responses for the few-shot learning task. (test only)
+- `few_shot_human` : For evaluating MLC on predicting human responses for the few-shot learning task. (test only)
+- `few_shot_human_mult10` : For evaluating MLC on predicting human responses for the few-shot learning task (human data up-sampled/repeated 10x). (test only)
+- `open_end_freeform` : For generating MLC responses on open-ended task. Here, the models iteratively fill out responses one-by-one. (test only)
 
 ## Training models from scratch
-To train BIML on few-shot learning (as in the BIML model in Fig. 2 and Table 4B), you can run the `train` command with default arguments:
+To train MLC on few-shot learning (as in the MLC model in Fig. 2 and Table 1), you can run the `train` command with default arguments:
 ```python
 python train.py --episode_type algebraic+biases --fn_out_model net-BIML.pt
 ```
