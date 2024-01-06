@@ -6,10 +6,9 @@ Meta-Learning for Compositionality (MLC) is an optimization procedure that encou
 
 **Note: Users can regard the acronym BIML as synonymous with MLC. The approach was renamed to MLC after the code was written.**
 
-This code accompanies the following submitted paper.
-- Lake, B. M. and Baroni, M. (submitted). Human-like systematic generalization through a meta-learning neural network.   
-
-You can email brenden AT nyu.edu if you would like a copy.
+## Citation
+Please cite the following article if you use any of this code in your work:
+- [Lake, B. M. and Baroni, M. (2023). Human-like systematic generalization through a meta-learning neural network.](https://www.nature.com/articles/s41586-023-06668-3.pdf) Nature, 623, 115-121. 
 
 ## Credits
 This repo borrows from the excellent [PyTorch seq2seq tutorial](https://pytorch.org/tutorials/beginner/translation_transformer.html).
