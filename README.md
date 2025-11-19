@@ -23,10 +23,10 @@ Python (3.7.9), PyTorch (1.10.1), sklean (0.24.2), numpy (1.21.5), matplotlib (3
 ## Downloading data and pre-trained models
 
 **Meta-training data**  
-To get the episodes used for meta-training, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/data_algebraic.zip) with the 100K meta-training episodes. Please extract `data_algebraic.zip` such that `data_algebraic`is a sub-directory of the main repo.
+To get the episodes used for meta-training, you should download the following [zip file](https://www.cs.princeton.edu/~bl8144/supplemental/BIML-large-files/data_algebraic.zip) with the 100K meta-training episodes. Please extract `data_algebraic.zip` such that `data_algebraic`is a sub-directory of the main repo.
 
 **Pre-trained models**  
-To get the top pre-trained models, you should download the following [zip file](https://cims.nyu.edu/~brenden/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-BIML-*.pt`.
+To get the top pre-trained models, you should download the following [zip file](https://www.cs.princeton.edu/~bl8144/supplemental/BIML-large-files/BIML_top_models.zip). Please extract `BIML_top_models.zip` such that `out_models` is a sub-directory of the main repo and contains the model files `net-BIML-*.pt`.
 
 ## Evaluating models
 There are many different ways to evaluate a model after training, each of which should take less than a minute on a standard desktop. Here are a few examples.
@@ -54,7 +54,7 @@ To evaluate the log-likelihood of all models and to reproduce Table 1 in the man
 
 
 ###  Sampling model responses for the few-shot learning task
-The models can be asked to mimic human responses on few-shot learning. To do so, the models sample from their distribution of possible outputs. A full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for MLC (or other models), you can type the following to generate a HTML page.
+The models can be asked to mimic human responses on few-shot learning. To do so, the models sample from their distribution of possible outputs. A full set of samples from the models is available on [this webpage](https://www.cs.princeton.edu/~bl8144/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for MLC (or other models), you can type the following to generate a HTML page.
 ```python
 python eval.py --episode_type few_shot_human_mult10 --sample_html --fn_out_model net-BIML-top.pt
 ```
@@ -90,7 +90,7 @@ Generating HTML file: human_few_shot_behavior.html
 ```
 
 ### Sampling model responses for the open-ended task
-The models can be asked to mimic human responses on the open-ended task. Again, a full set of samples from the models is available on [this webpage](https://cims.nyu.edu/~brenden/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for MLC, you can type the following two commands to generate a HTML page.
+The models can be asked to mimic human responses on the open-ended task. Again, a full set of samples from the models is available on [this webpage](https://www.cs.princeton.edu/~bl8144/supplemental/BIML-supp-results/sysgen.html). To reproduce the results for MLC, you can type the following two commands to generate a HTML page.
 ```python
 python eval.py --episode_type open_end_freeform --sample_iterative --fn_out_model net-BIML-open-ended-top.pt
 ```
